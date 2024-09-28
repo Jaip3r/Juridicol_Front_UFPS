@@ -1,9 +1,12 @@
-import { Box, Button, Flex, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, Text, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, useBreakpointValue } from "@chakra-ui/react";
 import LogoConsultorio from "../assets/LogoConsultorio.jpeg";
 import LogoUFPS from "../assets/logo-ufps.jpg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "./schemas/loginSchema";
+import { Link } from "react-router-dom";
+import { Background } from "../components/Background";
+import { CardWrapper } from "../components/CardWrapper";
 
 
 export const Login = () => {
@@ -28,22 +31,8 @@ export const Login = () => {
     });
 
     return (
-        <Flex
-            minH="100vh"
-            align="center"
-            justify="center"
-            bg="red.400" // Color de fondo del contenedor principal
-            p={4} // Padding para mejorar la visualización en pantallas pequeñas
-        >
-            <Box
-                maxW="900px" // Define el ancho máximo que puede tener el contenedor (1024px)
-                p={8} // Padding del contenedor
-                bg="white"
-                boxShadow="lg"
-                borderRadius="3.3rem"
-                width="100%"
-                height="auto"
-            >
+        <Background>
+            <CardWrapper wd={"100%"} maxWd={"900px"} p={8}>
                 <Stack direction={stackDirection} spacing={8} align="center" height="100%">
                     {/* Contenedor de la imagen */}
                     <Box
@@ -102,14 +91,14 @@ export const Login = () => {
                                 Ingresar
                             </Button>
 
-                            <Box mt={4} textAlign="center" color={"blue.400"} textDecoration={"underline"}>
-                                <Text>Olvide mi contraseña</Text>
+                            <Box mt={4} textAlign="center" color={"blue.400"} textDecoration={"underline"} cursor="pointer">
+                                <Link to="/request-password-reset">Olvidé mi contraseña</Link>
                             </Box>
                         </form>
                     </Box>
                 </Stack>
-            </Box>
-        </Flex>
+            </CardWrapper>
+        </Background>
     );
 
 };

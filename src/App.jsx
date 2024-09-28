@@ -1,13 +1,11 @@
 import './App.css';
-//import { Header } from './components/Header';
-//import { Pricing } from './components/pircing';
-import { Login } from './pages/Login';
+import { AppRouter } from './routes/AppRouter';
 
 function App() {
   
   return (
     <>
-      <Login></Login>
+      <AppRouter></AppRouter>
     </>
   )
 
