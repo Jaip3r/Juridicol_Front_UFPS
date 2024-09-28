@@ -1,6 +1,9 @@
-import { Box, Button, Flex, FormControl, FormLabel, Image, Input, Stack, Text, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Button, Flex, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, Text, useBreakpointValue } from "@chakra-ui/react";
 import LogoConsultorio from "../assets/LogoConsultorio.jpeg";
 import LogoUFPS from "../assets/logo-ufps.jpg";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { loginSchema } from "./schemas/loginSchema";
 
 
 export const Login = () => {
@@ -11,6 +14,18 @@ export const Login = () => {
 
     // Use `useBreakpointValue` para cambiar el orden en pantallas más pequeñas
     const stackDirection = useBreakpointValue({ base: "column-reverse", md: "row" });
+
+    // Configuración de react-hook-form
+    const { register, handleSubmit,
+        formState: { errors },
+        reset
+    } = useForm({ resolver: yupResolver(loginSchema) });
+
+    const onSubmit = handleSubmit((data) => {
+        console.log(data);
+        alert('enviando datos....');
+        reset();
+    });
 
     return (
         <Flex
@@ -63,15 +78,19 @@ export const Login = () => {
                             width="90%"
                             mb={6}
                         />
-                        <form>
-                            <FormControl id="usuario" mb={4}>
-                                <FormLabel>Usuario</FormLabel>
-                                <Input type="text" placeholder="Ingresa tu usuario" />
+                        <form onSubmit={onSubmit}>
+
+                            { /* Usuario */ }
+                            <FormControl id="usuario" mb={4} isInvalid={errors.usuario}>
+                                <FormLabel htmlFor="usuario">Usuario</FormLabel>
+                                <Input type="text" placeholder="Ingresa tu usuario" {...register("usuario")}/>
+                                <FormErrorMessage>{errors.usuario?.message}</FormErrorMessage>
                             </FormControl>
 
-                            <FormControl id="contraseña" mb={6}>
+                            <FormControl id="contraseña" mb={6} isInvalid={errors.password}>
                                 <FormLabel>Contraseña</FormLabel>
-                                <Input type="password" placeholder="Ingresa tu contraseña" />
+                                <Input type="password" placeholder="Ingresa tu contraseña" {...register("password")}/>
+                                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
                             </FormControl>
 
                             <Button
