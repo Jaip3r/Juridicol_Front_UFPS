@@ -1,8 +1,10 @@
-import { Box, VStack, Text, Link, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Image, List, ListItem, ListIcon } from '@chakra-ui/react';
+import { Box, VStack, Text, Link as ChakraLink, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Image, List, ListItem, ListIcon } from '@chakra-ui/react';
 import { FiHome, FiInbox, FiUsers } from 'react-icons/fi';
 import LogoJuridicol from '../assets/logo-juridicol.png';
 import { MdArrowForwardIos } from 'react-icons/md';
 import { FaRegFileAlt } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+
 
 export const Sidebar = () => {
 
@@ -38,7 +40,7 @@ export const Sidebar = () => {
                             <List spacing={2}>
                                 <ListItem>
                                     <ListIcon as={MdArrowForwardIos} color='black.500' width="10px"/>
-                                    <Link href="#">Dashboard</Link>
+                                    <ChakraLink as={Link} to="/admin-dashboard">Dashboard</ChakraLink>
                                 </ListItem>
                             </List>
                         </AccordionPanel>

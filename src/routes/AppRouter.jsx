@@ -4,6 +4,9 @@ import { RequestResetPasswordForm } from "../pages/BuscarCuenta";
 import { ResetPassword } from "../pages/ResetPassword";
 import { Dashboard } from "../pages/admin/Dashboard";
 import { Perfil } from "../pages/Perfil";
+import { RequireAuth } from "../components/auth/RequireAuth";
+import { NotFound } from "../pages/404/NotFound";
+import { Unauthorized } from "../pages/Unauthorized";
 
 
 export const AppRouter = () => {
@@ -13,16 +16,19 @@ export const AppRouter = () => {
             <Routes>
 
                 {/* Rutas públicas */}
-                <Route element={<Login />} path="/" />
+                <Route path="/" element={<Login />} />
                 <Route path="/request-password-reset" element={<RequestResetPasswordForm />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
                 {/* Rutas de admin */}
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/profile" element={<Perfil /> } />
+                <Route element={<RequireAuth allowedRoles={["administrador"]} />}>
+                    <Route path="/admin-dashboard" element={<Dashboard />} />
+                    <Route path="/admin-profile" element={<Perfil />} />
+                </Route>
 
-                {/* Ruta para manejar 404 (página no encontrada) */}
-                <Route element={<div>Recurso no encontrado</div>} path="*" />
+                {/* Ruta para manejar 404 (página no encontrada) y no acceso no autorizado */}
+                <Route path="/no-disponible" element={<Unauthorized />} />
+                <Route path="*" element={<NotFound />} />
 
             </Routes>
         </Router>

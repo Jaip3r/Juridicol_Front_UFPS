@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, useBreakpointValue, useToast } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, useBreakpointValue } from "@chakra-ui/react";
 import LogoConsultorio from "../assets/LogoConsultorio.jpeg";
 import LogoUFPS from "../assets/logo-ufps.jpg";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,8 @@ import { Background } from "../components/container/Background";
 import { CardWrapper } from "../components/utils/CardWrapper";
 import axios from "../services/axios";
 import { toast, Toaster } from "react-hot-toast";
+import { useAuth } from "../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 
 
 export const Login = () => {
@@ -21,6 +23,9 @@ export const Login = () => {
     const stackDirection = useBreakpointValue({ base: "column-reverse", md: "row" });
 
 
+    // Contexto de autenticación 
+    const { setAuth } = useAuth()
+
     // Configuración de react-hook-form
     const { register, handleSubmit,
         formState: { errors },
@@ -28,8 +33,10 @@ export const Login = () => {
     } = useForm({ resolver: yupResolver(loginSchema) });
 
 
-    const navigate = useNavigate(); // Hook que permite la navegación programática
+    // Hook que permite la navegación programática
+    const navigate = useNavigate(); 
 
+    // Manejo de envio de formulario
     const onSubmit = handleSubmit(async (data) => {
     
         try {
@@ -43,9 +50,26 @@ export const Login = () => {
                 }
             );
 
+            // Obtenemos los datos de autenticación y los guardamos en el contexto
+            const accessToken = response?.data?.data;
+            const decoded = jwtDecode(accessToken);
+            const user = decoded.username;
+            const rol = decoded.rol;
+            setAuth({ user, welcomeMessage: `Bienvenido ${user}`, accessToken, rol });
+
+             // Redirigimos al usuario a su página de inicio correspondiente según el rol
+            if (rol === 'administrador') {
+                navigate('/admin-dashboard');
+            } else if (rol === 'estudiante') {
+                navigate('/student-dashboard'); 
+            } else if (rol === 'profesor') {
+                navigate('/professor-dashboard'); 
+            } else {
+                navigate('/');
+            }
+
             // Limpiamos los campos
             reset();
-            console.log(response);
 
         }catch (error) {
             if (!error?.response) toast.error("Sin respuesta del servidor");

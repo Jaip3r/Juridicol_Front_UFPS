@@ -16,13 +16,15 @@ import {
     AccordionIcon, 
     AccordionPanel, 
     Text, 
-    Menu, 
+    Menu,
+    Link as ChakraLink, 
     MenuButton, MenuList, MenuDivider, MenuItem, Image, List, ListItem, ListIcon } from '@chakra-ui/react';
 import { FiHome, FiInbox, FiLogOut, FiMenu, FiSettings, FiUser, FiUsers } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import LogoJuridicol from '../assets/logo-juridicol.png';
 import { MdArrowForwardIos } from 'react-icons/md';
 import { FaRegFileAlt } from 'react-icons/fa';
+
 
 export const Navbar = () => {
 
@@ -65,7 +67,7 @@ export const Navbar = () => {
                         </Box>
                         <MenuDivider />
                         {/* Opción para ir al perfil */}
-                        <MenuItem icon={<FiSettings />}>
+                        <MenuItem icon={<FiSettings />} as={Link} to="/admin-profile">
                             Mi perfil
                         </MenuItem>
                         {/* Opción para cerrar sesión */}
@@ -103,7 +105,9 @@ export const Navbar = () => {
                                         <List spacing={2}>
                                             <ListItem>
                                                 <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                                <Link href="#">Dashboard</Link>
+                                                <ChakraLink as={Link} to="/admin-dashboard">
+                                                    Dashboard
+                                                </ChakraLink>
                                             </ListItem>
                                         </List>
                                 </AccordionPanel>
