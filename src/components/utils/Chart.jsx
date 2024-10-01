@@ -17,13 +17,13 @@ export const Chart = () => {
                 borderColor: 'blue',
                 tension: 0.1,
             },
-        ],
+        ]
     };
     
     return (
         
-        <Box bg="white" p={4} boxShadow="md" borderRadius="md">
-            <Line data={data} />
+        <Box bg="white" p={4} boxShadow="md" borderRadius="md" width="100%" height="100%">
+            <Line data={data} options={ { maintainAspectRatio : false } } />
         </Box>
 
     );

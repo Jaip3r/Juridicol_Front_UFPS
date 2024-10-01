@@ -17,6 +17,7 @@ export const Sidebar = () => {
             bg="white"
             shadow="md"
             p={4}
+            zIndex={1000}
         >
             <VStack align="start" spacing={4}>
                 <Image src={LogoJuridicol} alt='Logo-juridicol' />

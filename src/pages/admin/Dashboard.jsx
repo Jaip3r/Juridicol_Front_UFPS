@@ -28,7 +28,7 @@ export const Dashboard = () => {
             </Grid>
 
             {/* Espacio inferior para la gráfica */}
-            <Box mt={10} width="100%" maxW="800px" mx="auto">
+            <Box mt={10} width="100%" maxW="800px" mx="auto" height="700px">
                 <Chart />
             </Box>
 

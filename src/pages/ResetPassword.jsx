@@ -1,6 +1,6 @@
-import { Background } from '../components/Background';
-import { CardWrapper } from '../components/CardWrapper';
-import { ResetPasswordForm } from '../components/ResetPasswordForm';
+import { Background } from '../components/container/Background';
+import { CardWrapper } from '../components/utils/CardWrapper';
+import { ResetPasswordForm } from '../components/forms/ResetPasswordForm';
 
 export const ResetPassword = () => {
 

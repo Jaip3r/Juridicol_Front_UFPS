@@ -1,12 +1,14 @@
-import { Box, Button, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, useBreakpointValue, useToast } from "@chakra-ui/react";
 import LogoConsultorio from "../assets/LogoConsultorio.jpeg";
 import LogoUFPS from "../assets/logo-ufps.jpg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "./schemas/loginSchema";
-import { Link } from "react-router-dom";
-import { Background } from "../components/Background";
-import { CardWrapper } from "../components/CardWrapper";
+import { Link, useNavigate } from "react-router-dom";
+import { Background } from "../components/container/Background";
+import { CardWrapper } from "../components/utils/CardWrapper";
+import axios from "../services/axios";
+import { toast, Toaster } from "react-hot-toast";
 
 
 export const Login = () => {
@@ -18,20 +20,43 @@ export const Login = () => {
     // Use `useBreakpointValue` para cambiar el orden en pantallas más pequeñas
     const stackDirection = useBreakpointValue({ base: "column-reverse", md: "row" });
 
+
     // Configuración de react-hook-form
     const { register, handleSubmit,
         formState: { errors },
         reset
     } = useForm({ resolver: yupResolver(loginSchema) });
 
-    const onSubmit = handleSubmit((data) => {
-        console.log(data);
-        alert('enviando datos....');
-        reset();
+
+    const navigate = useNavigate(); // Hook que permite la navegación programática
+
+    const onSubmit = handleSubmit(async (data) => {
+    
+        try {
+
+            // Petición al servidor
+            const response = await axios.post("/auth/login", 
+                JSON.stringify({ email: data.usuario, password: data.password }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                }
+            );
+
+            // Limpiamos los campos
+            reset();
+            console.log(response);
+
+        }catch (error) {
+            if (!error?.response) toast.error("Sin respuesta del servidor");
+            else toast.error(error?.response?.data?.message);
+        }
+
     });
 
     return (
         <Background>
+            <Toaster />
             <CardWrapper wd={"100%"} maxWd={"900px"} p={8}>
                 <Stack direction={stackDirection} spacing={8} align="center" height="100%">
                     {/* Contenedor de la imagen */}
@@ -72,13 +97,24 @@ export const Login = () => {
                             { /* Usuario */ }
                             <FormControl id="usuario" mb={4} isInvalid={errors.usuario}>
                                 <FormLabel htmlFor="usuario">Usuario</FormLabel>
-                                <Input type="text" placeholder="Ingresa tu usuario" {...register("usuario")}/>
+                                <Input 
+                                    type="text" 
+                                    id="usuario"
+                                    autoFocus                                   
+                                    placeholder="Ingresa tu usuario"
+                                    autoComplete="off" 
+                                    {...register("usuario")}
+                                />
                                 <FormErrorMessage>{errors.usuario?.message}</FormErrorMessage>
                             </FormControl>
 
                             <FormControl id="contraseña" mb={6} isInvalid={errors.password}>
                                 <FormLabel>Contraseña</FormLabel>
-                                <Input type="password" placeholder="Ingresa tu contraseña" {...register("password")}/>
+                                <Input 
+                                    type="password" 
+                                    placeholder="Ingresa tu contraseña" 
+                                    {...register("password")}
+                                />
                                 <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
                             </FormControl>
 

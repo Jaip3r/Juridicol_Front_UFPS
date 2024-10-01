@@ -3,8 +3,8 @@ import { FormControl, FormLabel, Input, Button, Image, FormErrorMessage } from '
 import LogoConsultorio from "../assets/LogoConsultorio.jpeg";
 import { forgotPasswordSchema } from './schemas/forgotPasswordSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Background } from '../components/Background';
-import { CardWrapper } from '../components/CardWrapper';
+import { Background } from '../components/container/Background';
+import { CardWrapper } from '../components/utils/CardWrapper';
 
 export const RequestResetPasswordForm = () => {
 

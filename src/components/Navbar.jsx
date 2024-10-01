@@ -1,4 +1,23 @@
-import { Flex, Spacer, Box, IconButton, Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, useDisclosure, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Text, Menu, MenuButton, MenuList, MenuDivider, MenuItem, Image, List, ListItem, ListIcon } from '@chakra-ui/react';
+import { 
+    Flex, 
+    Spacer, 
+    Box, 
+    IconButton, 
+    Drawer, 
+    DrawerOverlay, 
+    DrawerContent, 
+    DrawerCloseButton, 
+    DrawerHeader, 
+    DrawerBody, 
+    useDisclosure, 
+    Accordion, 
+    AccordionItem, 
+    AccordionButton, 
+    AccordionIcon, 
+    AccordionPanel, 
+    Text, 
+    Menu, 
+    MenuButton, MenuList, MenuDivider, MenuItem, Image, List, ListItem, ListIcon } from '@chakra-ui/react';
 import { FiHome, FiInbox, FiLogOut, FiMenu, FiSettings, FiUser, FiUsers } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import LogoJuridicol from '../assets/logo-juridicol.png';
@@ -16,6 +35,7 @@ export const Navbar = () => {
         <Flex
             as="header"
             position="fixed"
+            zIndex={999}
             top="0"
             left={{ base: "0", md: "250px" }} // Ajustar el desplazamiento según el sidebar
             right="0"
