@@ -18,7 +18,7 @@ export const useRefreshToken = () => {
             console.log(response.data?.access_token);
             // Decodificar el token para obtener los roles
             const decoded = jwtDecode(response.data?.access_token);
-            return { ...prev, access_token: response.data?.access_token, role: decoded.role };
+            return { ...prev, accessToken: response.data?.access_token, rol: decoded.rol };
         })
         return response.data.access_token; // Devuelve el nuevo access token que se obtuvo del servidor
 

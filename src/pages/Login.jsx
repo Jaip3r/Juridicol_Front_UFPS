@@ -1,16 +1,17 @@
-import { Box, Button, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, useBreakpointValue } from "@chakra-ui/react";
 import LogoConsultorio from "../assets/LogoConsultorio.jpeg";
 import LogoUFPS from "../assets/logo-ufps.jpg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "./schemas/loginSchema";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Background } from "../components/container/Background";
 import { CardWrapper } from "../components/utils/CardWrapper";
 import axios from "../services/axios";
 import { toast, Toaster } from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
+import { useEffect } from "react";
 
 
 export const Login = () => {
@@ -24,7 +25,7 @@ export const Login = () => {
 
 
     // Contexto de autenticación 
-    const { setAuth } = useAuth()
+    const { setAuth, persist, setPersist  } = useAuth()
 
     // Configuración de react-hook-form
     const { register, handleSubmit,
@@ -35,6 +36,7 @@ export const Login = () => {
 
     // Hook que permite la navegación programática
     const navigate = useNavigate(); 
+    const location = useLocation(); // Hook que te da acceso a la ubicación actual.
 
     // Manejo de envio de formulario
     const onSubmit = handleSubmit(async (data) => {
@@ -57,16 +59,21 @@ export const Login = () => {
             const rol = decoded.rol;
             setAuth({ user, welcomeMessage: `Bienvenido ${user}`, accessToken, rol });
 
-             // Redirigimos al usuario a su página de inicio correspondiente según el rol
+            // Redirigimos al usuario a su página de inicio correspondiente según el rol
+            let baseURL = '';
+
             if (rol === 'administrador') {
-                navigate('/admin-dashboard');
+                baseURL = '/admin-dashboard';
             } else if (rol === 'estudiante') {
-                navigate('/student-dashboard'); 
+                baseURL = '/student-dashboard'; 
             } else if (rol === 'profesor') {
-                navigate('/professor-dashboard'); 
+                baseURL = '/professor-dashboard'; 
             } else {
-                navigate('/');
+                baseURL = '/';
             }
+
+            const from = location.state?.from?.pathname || baseURL;
+            navigate(from, { replace: true }); // Redirige al usuario a la página desde donde intentaba acceder
 
             // Limpiamos los campos
             reset();
@@ -77,6 +84,14 @@ export const Login = () => {
         }
 
     });
+
+    const togglePersist = () => {
+        setPersist(prev => !prev)
+    }
+
+    useEffect(() => {
+        localStorage.setItem("persist", persist);
+    }, [persist]);
 
     return (
         <Background>
@@ -150,6 +165,17 @@ export const Login = () => {
                             >
                                 Ingresar
                             </Button>
+
+                            { /* Checkbox de persistencia */ }
+                            <Checkbox 
+                                mt={4} 
+                                isChecked={persist} 
+                                onChange={togglePersist} 
+                                colorScheme="red" 
+                                size="md"
+                            >
+                                Confiar en este dispositivo
+                            </Checkbox>
 
                             <Box mt={4} textAlign="center" color={"blue.400"} textDecoration={"underline"} cursor="pointer">
                                 <Link to="/request-password-reset">Olvidé mi contraseña</Link>
