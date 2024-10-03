@@ -20,10 +20,11 @@ import {
     Link as ChakraLink, 
     MenuButton, MenuList, MenuDivider, MenuItem, Image, List, ListItem, ListIcon } from '@chakra-ui/react';
 import { FiHome, FiInbox, FiLogOut, FiMenu, FiSettings, FiUser, FiUsers } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LogoJuridicol from '../assets/logo-juridicol.png';
 import { MdArrowForwardIos } from 'react-icons/md';
 import { FaRegFileAlt } from 'react-icons/fa';
+import { useLogout } from '../hooks/useLogout';
 
 
 export const Navbar = () => {
@@ -32,6 +33,14 @@ export const Navbar = () => {
     // onOpen permite abrir el Drawer
     // onClose permite cerrar el Drawer
     const { isOpen, onOpen, onClose } = useDisclosure(); // Hook que permite manejar la apertura y cierre de elementos como el Drawer
+
+    const navigate = useNavigate();
+    const logout = useLogout();
+
+    const signOut = async () => {
+        await logout();
+        navigate('/');
+    }
 
     return (
         <Flex
@@ -71,7 +80,7 @@ export const Navbar = () => {
                             Mi perfil
                         </MenuItem>
                         {/* Opción para cerrar sesión */}
-                        <MenuItem icon={<FiLogOut />} color="red.500">
+                        <MenuItem icon={<FiLogOut />} color="red.500" onClick={signOut}>
                             Salir
                         </MenuItem>
                     </MenuList>

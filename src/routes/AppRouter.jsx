@@ -8,12 +8,17 @@ import { RequireAuth } from "../components/auth/RequireAuth";
 import { NotFound } from "../pages/404/NotFound";
 import { Unauthorized } from "../pages/Unauthorized";
 import { PersistLogin } from "../components/auth/PersistLogin";
+import { ChangePassword } from "../pages/common/ChangePassword";
+import { SessionExpiredModal } from "../components/utils/SessionExpiredModal";
 
 
 export const AppRouter = () => {
 
     return (
         <Router>
+
+            <SessionExpiredModal />
+
             <Routes>
 
                 {/* Rutas públicas */}
@@ -28,16 +33,17 @@ export const AppRouter = () => {
                     <Route element={<RequireAuth allowedRoles={["administrador"]} />}>
                         <Route path="/admin-dashboard" element={<Dashboard />} />
                         <Route path="/admin-profile" element={<Perfil />} />
+                        <Route path="/change-password" element={<ChangePassword />} />
                     </Route>
+
+                    {/* Ruta para manejar 404 (página no encontrada) y acceso no autorizado */}
+                    <Route path="/unauthorized" element={<Unauthorized />} />
+                    <Route path="*" element={<NotFound />} />
 
                 </Route>
 
-                {/* Ruta para manejar 404 (página no encontrada) y no acceso no autorizado */}
-                <Route path="/no-disponible" element={<Unauthorized />} />
-                <Route path="*" element={<NotFound />} />
-
             </Routes>
         </Router>
-    )
+    );
 
-}
+};

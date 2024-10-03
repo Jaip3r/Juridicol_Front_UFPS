@@ -10,6 +10,5 @@ export default axios.create({
 // y autoriza que las credenciales se envien junto con la solicitud
 export const axiosPrivate = axios.create({
     baseURL: BASE_URL,
-    headers: { 'Content-Type': 'application/json' },
     withCredentials: true
 });

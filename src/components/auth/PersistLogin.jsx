@@ -28,7 +28,11 @@ export const PersistLogin = () => {
         }
 
         // Si no hay token, intenta renovarlo
-        !auth?.accessToken ? verifyRefreshToken() : setIsLoading(false);
+        if (!auth?.accessToken && persist) {
+            verifyRefreshToken();
+        } else {
+            setIsLoading(false);
+        }
 
         return () => isMounted = false; // Limpia al desmontar
 

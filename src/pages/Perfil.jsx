@@ -12,7 +12,8 @@ import { PageLayout } from "../components/container/PageLayout";
 import { useAxiosPrivate } from "../hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useSessionExpired } from "../hooks/useSessionExpired";
+import { Link } from "react-router-dom";
 
 
 export const Perfil = () => {
@@ -32,9 +33,10 @@ export const Perfil = () => {
     // Estado para verificar la carga
     const [loading, setLoading] = useState(true);
 
+    // Estado para el manejo del estado de la sesión
+    const { setIsSessionExpired } = useSessionExpired();
+
     const axiosPrivate = useAxiosPrivate(); // Instancia de axios con autenticación.
-    const navigate = useNavigate(); // Hook para redirigir al usuario.
-    const location = useLocation(); // Obtiene la ubicación actual del usuario.
 
     // Hook que permite la obtención de la información del usuario al rederizarse el componente
     useEffect(() => {
@@ -62,7 +64,7 @@ export const Perfil = () => {
                 
             } catch (error) {
                 if (!error?.response) toast.error("Sin respuesta del servidor");
-                else if (error?.response?.status === 403) navigate("/", { state: { from: location }, replace: true }); // En caso de finalizar la sesión se redirije al usuario
+                else if (error?.response?.status === 403 && error?.response?.data?.message === "Token de refresco inválido o revocado") setIsSessionExpired(true);
                 else toast.error('Error al obtener los datos del usuario')
                 setLoading(false);  // Deja de cargar aunque ocurra un error
             }
@@ -168,7 +170,7 @@ export const Perfil = () => {
                         </Stack>
 
                         <Stack justify="center" direction={{ base: "column", sm: "row" }} spacing={4} mt={6}>
-                            <Button colorScheme="blue">Cambiar Contraseña</Button>
+                            <Button as={Link} to="/change-password" colorScheme="red">Cambiar Contraseña</Button>
                         </Stack>
                     </Stack>
 
