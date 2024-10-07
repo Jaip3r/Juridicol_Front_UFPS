@@ -8,7 +8,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Background } from "../components/container/Background";
 import { CardWrapper } from "../components/utils/CardWrapper";
 import axios from "../services/axios";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
@@ -95,7 +95,6 @@ export const Login = () => {
 
     return (
         <Background>
-            <Toaster />
             <CardWrapper wd={"100%"} maxWd={"900px"} p={8}>
                 <Stack direction={stackDirection} spacing={8} align="center" height="100%">
                     {/* Contenedor de la imagen */}

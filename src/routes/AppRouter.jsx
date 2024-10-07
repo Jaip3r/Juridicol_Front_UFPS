@@ -10,6 +10,9 @@ import { Unauthorized } from "../pages/Unauthorized";
 import { PersistLogin } from "../components/auth/PersistLogin";
 import { ChangePassword } from "../pages/common/ChangePassword";
 import { SessionExpiredModal } from "../components/utils/SessionExpiredModal";
+import { Usuarios } from "../pages/admin/users/Usuarios";
+import { Register } from "../pages/admin/users/Register";
+import { UpdateUser } from "../pages/admin/users/UpdateUser";
 
 
 export const AppRouter = () => {
@@ -34,6 +37,9 @@ export const AppRouter = () => {
                         <Route path="/admin-dashboard" element={<Dashboard />} />
                         <Route path="/admin-profile" element={<Perfil />} />
                         <Route path="/change-password" element={<ChangePassword />} />
+                        <Route path="/register" element={<Register />}></Route>
+                        <Route path="/users/:rol" element={<Usuarios />} />
+                        <Route path="/users/edit/:id" element={<UpdateUser />} /> 
                     </Route>
 
                     {/* Ruta para manejar 404 (página no encontrada) y acceso no autorizado */}

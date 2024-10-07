@@ -1,3 +1,4 @@
+import { Toaster } from 'react-hot-toast';
 import './App.css';
 import { AuthProvider } from './context/AuthProvider';
 import { SessionExpiredProvider } from './context/SessionExpiredProvider';
@@ -8,6 +9,7 @@ function App() {
   return (
     <AuthProvider>
       <SessionExpiredProvider>
+        <Toaster />
         <AppRouter></AppRouter>
       </SessionExpiredProvider>
     </AuthProvider>

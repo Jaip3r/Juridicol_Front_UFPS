@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { useAxiosPrivate } from "../../hooks/useAxiosPrivate";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useSessionExpired } from "../../hooks/useSessionExpired";
 
 
@@ -42,21 +42,35 @@ export const ChangePasswordForm = () => {
                 newPassword: data.new_password
             }
 
-            const response = await axiosPrivate.put('/auth/change-password', body, {
-                headers:{
-                    "Content-Type": "application/json"
+            const response = await toast.promise(
+
+                axiosPrivate.put('/auth/change-password', body, {
+                    headers:{
+                        "Content-Type": "application/json"
+                    }
+                }),
+                {
+                    loading: 'Actualizando contraseña...',
+                    success: '¡Contraseña actualizada correctamente!',
+                    error: (error) => {
+                        if (!error?.response) toast.error("Sin respuesta del servidor");
+                        else if (error?.response?.status === 403 && error?.response?.data?.message === "Token de refresco inválido o revocado") {
+                            return "Sesión Finalizada";
+                        } else {
+                            return error?.response?.data?.message || 'Error al actualizar contraseña';
+                        }
+                    }
                 }
-            }); 
+
+            )
+        
 
             if(response?.status === 200){
-                toast.success(`¡${response?.data?.message}!`);
                 reset();
             }
 
         } catch (error) {
-            if (!error?.response) toast.error("Sin respuesta del servidor");
-            else if (error?.response?.status === 403 && error?.response?.data?.message === "Token de refresco inválido o revocado") setIsSessionExpired(true);
-            else toast.error(error?.response?.data?.message);
+            if (error?.response?.status === 403 && error?.response?.data?.message === "Token de refresco inválido o revocado") setIsSessionExpired(true);
         }
 
     });
@@ -64,8 +78,6 @@ export const ChangePasswordForm = () => {
     return (
         
         <form onSubmit={onSubmit}>
-
-            <Toaster />
 
             <Stack spacing={4}>
 

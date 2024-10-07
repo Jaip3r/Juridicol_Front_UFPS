@@ -11,7 +11,7 @@ import {
 import { PageLayout } from "../components/container/PageLayout";
 import { useAxiosPrivate } from "../hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useSessionExpired } from "../hooks/useSessionExpired";
 import { Link } from "react-router-dom";
 
@@ -78,8 +78,6 @@ export const Perfil = () => {
     return (
         
         <PageLayout>
-
-            <Toaster />
 
             { loading ? (
 

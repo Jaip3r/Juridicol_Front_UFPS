@@ -23,7 +23,7 @@ export const Sidebar = () => {
         >
             <VStack align="start" spacing={4}>
                 <Image src={LogoJuridicol} alt='Logo-juridicol' />
-                <Accordion allowToggle defaultIndex={[0]} borderColor="transparent">
+                <Accordion allowToggle>
 
                     {/* Apartado de Dashboard */}
                     <AccordionItem borderTopColor="red" borderTopWidth="3px" borderBottomWidth="1px" borderBottomColor="gray.200">
@@ -61,15 +61,15 @@ export const Sidebar = () => {
                             <List spacing={2}>
                                 <ListItem>
                                     <ListIcon as={MdArrowForwardIos} color='black.500' width="10px"/>   
-                                    <Link href="#">Registrar Usuarios</Link>
+                                    <ChakraLink as={Link} to="/register">Registrar Usuarios</ChakraLink>
                                 </ListItem>
                                 <ListItem>
                                     <ListIcon as={MdArrowForwardIos} color='black.500' width="10px"/>
-                                    <Link href="#">Ver Practicantes</Link>
+                                    <ChakraLink as={Link} to="/users/practicantes">Ver Practicantes</ChakraLink>
                                 </ListItem>
                                 <ListItem>
                                     <ListIcon as={MdArrowForwardIos} color='black.500' width="10px"/>
-                                    <Link href="#">Ver Docentes</Link>
+                                    <ChakraLink as={Link} to="/users/profesores">Ver docentes</ChakraLink>
                                 </ListItem>
                             </List>
                         </AccordionPanel>

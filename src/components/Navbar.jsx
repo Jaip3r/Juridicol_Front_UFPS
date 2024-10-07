@@ -137,15 +137,17 @@ export const Navbar = () => {
                                     <List spacing={2}>
                                         <ListItem>
                                             <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                            <Link href="#">Registrar Usuarios</Link>
+                                            <ChakraLink as={Link} to="/register">
+                                                Registrar Usuarios
+                                            </ChakraLink>
                                         </ListItem>
                                         <ListItem>
                                             <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                            <Link href="#">Ver Practicantes</Link>
+                                            <ChakraLink as={Link} to="/users/practicantes">Ver Practicantes</ChakraLink>
                                         </ListItem>
                                         <ListItem>
                                             <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                            <Link href="#">Ver Docentes</Link>
+                                            <ChakraLink as={Link} to="/users/profesores">Ver Docentes</ChakraLink>
                                         </ListItem>
                                     </List>
                                 </AccordionPanel>
