@@ -9,7 +9,11 @@ function App() {
   return (
     <AuthProvider>
       <SessionExpiredProvider>
-        <Toaster />
+        <Toaster
+          toastOptions={
+            { duration: 3500 }
+          }
+        />
         <AppRouter></AppRouter>
       </SessionExpiredProvider>
     </AuthProvider>

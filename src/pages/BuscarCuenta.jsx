@@ -5,6 +5,8 @@ import { forgotPasswordSchema } from './schemas/forgotPasswordSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Background } from '../components/container/Background';
 import { CardWrapper } from '../components/utils/CardWrapper';
+import axios from '../services/axios';
+import toast from 'react-hot-toast';
 
 
 export const RequestResetPasswordForm = () => {
@@ -15,10 +17,35 @@ export const RequestResetPasswordForm = () => {
         reset 
     } = useForm({ resolver: yupResolver(forgotPasswordSchema) });
 
-    const onSubmit = handleSubmit((data) => {
-        console.log(data);
-        alert('enviando datos....');
+    const onSubmit = handleSubmit(async (data) => {
+
+        const body = {
+            email: data.usuario
+        }
+        
+        const response = await toast.promise(
+
+            axios.post('/auth/forgot-password', body, {
+                headers:{
+                    "Content-Type": "application/json"
+                }
+            }),
+            {
+                loading: 'Verificando información...',
+                success: 'Si el usuario se encuentra registrado, recibirá un correo',
+                error: (error) => {
+                    if (!error?.response) toast.error("Sin respuesta del servidor");
+                    else {
+                        return error?.response?.data?.message || 'Error al enviar correo de restablecimiento';
+                    }
+                }
+            }
+
+        );
+         
+        console.log(response);
         reset();
+
     });
 
     return (
@@ -38,6 +65,7 @@ export const RequestResetPasswordForm = () => {
                         <Input
                             type="text"
                             {...register('usuario')}
+                            autoComplete='off'
                         />
                         <FormErrorMessage>{errors.usuario?.message}</FormErrorMessage>
                     </FormControl>

@@ -1,7 +1,10 @@
 import { Button, FormControl, FormErrorMessage, FormLabel, Input } from '@chakra-ui/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
+import { useParams, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
+import axios from '../../services/axios';
+import toast from 'react-hot-toast';
 
 
 export const ResetPasswordForm = () => {
@@ -19,14 +22,45 @@ export const ResetPasswordForm = () => {
     // Configuración de hook-form
     const { register, 
         handleSubmit, 
-        formState: { errors }, 
-        reset 
+        formState: { errors } 
     } = useForm({ resolver: yupResolver(resetPasswordSchema) });
 
-    const onSubmit = handleSubmit((data) => {
-        console.log(data);
-        alert('enviando datos....');
-        reset();
+    const { id, token } = useParams();
+    const navigate = useNavigate();
+
+    const onSubmit = handleSubmit(async (data) => {
+
+        const body = {
+
+            resetToken: token,
+            newPassword: data.newPassword,
+            userId: id
+
+        }
+
+        const response = await toast.promise(
+
+            axios.put('/auth/reset-password', body, {
+                headers:{
+                    "Content-Type": "application/json"
+                }
+            }),
+            {
+                loading: 'Verificando información...',
+                success: 'Contraseña restablecida con éxito',
+                error: (error) => {
+                    if (!error?.response) toast.error("Sin respuesta del servidor");
+                    else {
+                        return error?.response?.data?.message || 'Error al restablecer contraseña';
+                    }
+                }
+            }
+
+        );
+
+        console.log(response);
+        navigate("/");
+
     });
 
     return (

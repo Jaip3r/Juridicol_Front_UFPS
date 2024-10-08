@@ -27,7 +27,7 @@ export const AppRouter = () => {
                 {/* Rutas públicas */}
                 <Route path="/" element={<Login />} />
                 <Route path="/request-password-reset" element={<RequestResetPasswordForm />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
 
                 {/* Rutas protegidas */}
                 <Route element={<PersistLogin />}>
