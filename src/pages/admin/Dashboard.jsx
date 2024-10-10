@@ -38,7 +38,6 @@ export const Dashboard = () => {
 
                 const response = await axiosPrivate.get('/users/count');
                 const data = response?.data?.data;
-                console.log(data);
 
                 setInfo({
                     userCount: data

@@ -19,7 +19,7 @@ export const StatCard = ({ title, count, imageSrc, info }) => {
             {
                 info !== "" && info !== null && info !== undefined
                     ?
-                        <Tooltip label={info.map(item => `${item.rol}: ${item.count}`).join(", ")}>
+                        <Tooltip hasArrow label={info.map(item => `${item.rol}: ${item.count}`).join(", ")}>
                             <Text fontSize="2xl">{count}</Text>
                         </Tooltip>
                     :   

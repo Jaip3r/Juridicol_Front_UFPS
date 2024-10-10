@@ -22,7 +22,7 @@ export const Unauthorized = () => {
         if (rol === 'administrador') {
             return '/admin-dashboard';
         } else if (rol === 'estudiante') {
-            return '/user';
+            return '/student-home';
         } else if (rol === 'profesor') {
             return '/profesor';
         }

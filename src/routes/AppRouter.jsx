@@ -13,6 +13,7 @@ import { SessionExpiredModal } from "../components/utils/SessionExpiredModal";
 import { Usuarios } from "../pages/admin/users/Usuarios";
 import { Register } from "../pages/admin/users/Register";
 import { UpdateUser } from "../pages/admin/users/UpdateUser";
+import { Home } from "../pages/student/Home";
 
 
 export const AppRouter = () => {
@@ -31,6 +32,12 @@ export const AppRouter = () => {
 
                 {/* Rutas protegidas */}
                 <Route element={<PersistLogin />}>
+
+                    {/* Rutas de estudiante */}
+                    <Route element={<RequireAuth allowedRoles={["estudiante"]} />}>
+                        <Route path="student-home" element={<Home />} />
+                        <Route path="/student-profile" element={<Perfil />} />
+                    </Route>
 
                     {/* Rutas de admin */}
                     <Route element={<RequireAuth allowedRoles={["administrador"]} />}>

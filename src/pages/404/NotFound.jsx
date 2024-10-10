@@ -13,7 +13,6 @@ export const NotFound = () => {
 
     // Obtenemos el objeto de autenticación
     const { auth } = useAuth();
-    console.log(auth);
 
     // Función encargada de redirijir al usuario en base a su rol
     const redirectTo = () => {
@@ -23,7 +22,7 @@ export const NotFound = () => {
         if (rol === 'administrador') {
             return '/admin-dashboard'; 
         } else if (rol === 'estudiante') {
-            return '/user'; 
+            return '/student-home'; 
         } else if (rol === 'profesor') {
             return '/profesor'; 
         } 

@@ -65,7 +65,7 @@ export const Login = () => {
             if (rol === 'administrador') {
                 baseURL = '/admin-dashboard';
             } else if (rol === 'estudiante') {
-                baseURL = '/student-dashboard'; 
+                baseURL = '/student-home'; 
             } else if (rol === 'profesor') {
                 baseURL = '/professor-dashboard'; 
             } else {
