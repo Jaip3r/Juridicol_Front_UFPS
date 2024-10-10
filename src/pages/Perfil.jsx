@@ -7,7 +7,8 @@ import {
     FormLabel,  
     Input, 
     Spinner, 
-    Stack } from "@chakra-ui/react";
+    Stack, 
+    Text} from "@chakra-ui/react";
 import { PageLayout } from "../components/container/PageLayout";
 import { useAxiosPrivate } from "../hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
@@ -81,7 +82,7 @@ export const Perfil = () => {
 
             { loading ? (
 
-                <Flex justify="center" align="center" h="100vh">
+                <Flex justify="center" align="center" h="100vh" flexDirection="column">
                     <Spinner 
                         size="xl" 
                         thickness="4px" 
@@ -89,6 +90,9 @@ export const Perfil = () => {
                         emptyColor="gray.200" 
                         color="red.500" 
                     />
+                    <Text mt={4} fontSize={{ base: "md", md: "lg" }} color="gray.600">
+                        Cargando información del usuario...
+                    </Text>
                 </Flex>
 
             ) : (

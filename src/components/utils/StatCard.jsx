@@ -1,7 +1,7 @@
-import { Box, Image, Text } from "@chakra-ui/react";
+import { Box, Image, Text, Tooltip } from "@chakra-ui/react";
 
 
-export const StatCard = ({ title, count, imageSrc }) => {
+export const StatCard = ({ title, count, imageSrc, info }) => {
 
     return (
         
@@ -16,7 +16,15 @@ export const StatCard = ({ title, count, imageSrc }) => {
         >
             <Image src={imageSrc} alt={title} boxSize="80px" mx="auto" mb={4} />
             <Text fontSize="lg" fontWeight="bold">{title}</Text>
-            <Text fontSize="2xl">{count}</Text>
+            {
+                info !== "" && info !== null && info !== undefined
+                    ?
+                        <Tooltip label={info.map(item => `${item.rol}: ${item.count}`).join(", ")}>
+                            <Text fontSize="2xl">{count}</Text>
+                        </Tooltip>
+                    :   
+                        <Text fontSize="2xl">{count}</Text>
+            }
         </Box>
 
     );

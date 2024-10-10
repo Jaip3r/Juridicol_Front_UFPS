@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner, useBreakpointValue, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, useBreakpointValue, useDisclosure } from "@chakra-ui/react";
 import { PageLayout } from "../../../components/container/PageLayout";
 import { useState } from "react";
 import { useSessionExpired } from "../../../hooks/useSessionExpired";
@@ -125,7 +125,7 @@ export const Usuarios = () => {
 
       { loading ? (
 
-        <Flex justify="center" align="center" h="100vh">
+        <Flex justify="center" align="center" h="100vh" flexDirection="column">
           <Spinner
             size="xl"
             thickness="4px"
@@ -133,6 +133,9 @@ export const Usuarios = () => {
             emptyColor="gray.200"
             color="red.500"
           />
+          <Text mt={4} fontSize={{ base: "md", md: "lg" }} color="gray.600">
+            Obteniendo información de los usuarios...
+          </Text>
         </Flex>
  
       ) : (

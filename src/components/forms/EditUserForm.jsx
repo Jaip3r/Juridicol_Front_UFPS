@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import { useSessionExpired } from '../../hooks/useSessionExpired';
 import { useAxiosPrivate } from '../../hooks/useAxiosPrivate';
 import { useEffect, useState } from 'react';
-import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input, Select, Spinner, Stack } from '@chakra-ui/react';
+import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input, Select, Spinner, Stack, Text } from '@chakra-ui/react';
 import { toast } from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -142,7 +142,7 @@ export const EditUserForm = () => {
 
             { loading ? (
 
-                <Flex justify="center" align="center" h="100vh">
+                <Flex justify="center" align="center" h="100vh" flexDirection="column">
                     <Spinner 
                         size="xl" 
                         thickness="4px" 
@@ -150,6 +150,9 @@ export const EditUserForm = () => {
                         emptyColor="gray.200" 
                         color="red.500" 
                     />
+                    <Text mt={4} fontSize={{ base: "md", md: "lg" }} color="gray.600">
+                        Cargando información del usuario...
+                    </Text>
                 </Flex>
 
             ) : (
