@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAxiosPrivate } from './useAxiosPrivate';
+import { filterParams } from '../utils/filterParams';
 
 export const useFetchTableData = ({
     endpoint,
@@ -31,7 +32,9 @@ export const useFetchTableData = ({
 
     const fetchData = useCallback(
 
-        async (direction = 'next', customParams = {}) => {
+        async (direction = 'next', customParamsOverride = {}) => {
+
+            console.log('fetchData se ejecuta', direction, customParamsOverride);
 
             setLoading(true);
             setError(null);
@@ -39,22 +42,35 @@ export const useFetchTableData = ({
             try {
 
                 // Combinamos parámetros iniciales y personalizados
+                console.log('Parametros antes de junte')
+                console.log(initialParams)
+                console.log(customParams);
                 const params = {
                     ...initialParams,
                     ...customParams,
+                    ...customParamsOverride
                 };
 
+                console.log("Despues del junte")
+                console.log(params)
+
                 // Agregamos 'cursor' o 'prevCursor' según la dirección de paginación
-                if (direction === 'next' && pagination.nextCursor) {
+                if (direction === 'next' && pagination.nextCursor && direction !== 'reset') {
                     params.cursor = pagination.nextCursor;
-                } else if (direction === 'prev' && pagination.prevCursor) {
+                }
+                else if (direction === 'prev' && pagination.prevCursor) {
                     params.prevCursor = pagination.prevCursor;
+                } 
+                else if (direction === 'reset') {
+                    // Reiniciamos la paginación
+                    params.cursor = null;
+                    params.prevCursor = null;
                 }
 
                 // Solo enviamos a la solicitud aquellos parametros que contengan un valor
-                const filteredParams = Object.entries(params) // Convertimos el objeto en un array de entradas clave:valor
-                    .filter(([key, value]) => value !== '' && value !== null && value !== undefined) // Filtramos por aquellos con valores no vacios
-                    .reduce((acc, [key, value]) => ({ ...acc, [key]:value }), {}); // Reconstruimos el objeto
+                const filteredParams = filterParams(params);
+                console.log('Parametros despues del filto')
+                console.log(filteredParams);
 
                 // Realizamos la solicitud
                 const response = await axiosPrivate.get(endpoint, { params: filteredParams });
@@ -66,28 +82,31 @@ export const useFetchTableData = ({
                     nextCursor: response?.data?.nextCursor,
                     prevCursor: response?.data?.prevCursor,
                     pageSize: response?.data?.pageSize,
-                    totalRecords: response?.data?.totalRecords,
                     currentPage: 
                         direction === 'next'
                             ? prev.currentPage + 1
                             : direction === 'prev'
-                            ? prev.currentPage - 1
-                            : 1
+                                ? prev.currentPage - 1
+                                : 1
                 }));
 
             } catch (error) {
                 setError(error);
-                onError(error, "Error al obtener los datos de los usarios");
+                onError(error, "Error al obtener los datos");
             } finally {
                 setLoading(false);
             }
 
         },
-        [axiosPrivate, endpoint, initialParams, pagination.nextCursor, pagination.prevCursor]
+        [axiosPrivate, endpoint, initialParams, customParams, pagination.nextCursor, pagination.prevCursor]
 
     );
-
+    
     useEffect(() => {
+        
+        console.log("dependencias")
+        console.log(dependencies);
+        console.log("Me ejecute")
 
         // Si alguna de las dependencias cambia, reiniciamos la paginación y los datos
         setPagination({
@@ -98,9 +117,41 @@ export const useFetchTableData = ({
             pageSize: 0,
         });
         setData(initialData);
-        fetchData('reset', customParams);
 
-    }, dependencies);
+        // Consultamos el total de registros a obtener
+        const countRecords = async () => {
+
+            try {
+
+                // Combinamos los parametros iniciales y personalizados
+                const params = {
+                    ...initialParams,
+                    ...customParams
+                };
+
+                // Solo enviamos a la solicitud aquellos parametros que contengan un valor
+                const filteredParams = filterParams(params);
+
+                // Realizamos la solicitud
+                const response = await axiosPrivate.get(`${endpoint}/count`, { params: filteredParams });
+                const data = response?.data;
+
+                // setear el valor de totalRecords
+                setPagination(prev => {
+                    return {...prev, totalRecords: data.totalRecords}
+                })
+                
+            } catch (error) {
+                onError(error, "Error al realizar el conteo de registros");
+            }
+
+        };
+
+        countRecords();
+
+        fetchData('reset');
+
+    }, [...dependencies]);
 
     return {
         data,

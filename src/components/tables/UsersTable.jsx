@@ -10,6 +10,7 @@ export const UsersTable = ({
 
     return (
         <Table variant="simple">
+
             <Thead>
                 <Tr>
                     <Th>Nombres</Th>
@@ -23,6 +24,7 @@ export const UsersTable = ({
                     <Th>Acciones</Th>
                 </Tr>
             </Thead>
+
             <Tbody>
                 {usuarios.map((usuario) => (
                     <Tr key={usuario.id}>

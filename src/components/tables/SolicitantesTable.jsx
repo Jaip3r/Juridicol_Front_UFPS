@@ -9,7 +9,9 @@ export const SolicitantesTable = ({
 
   return (
     <Table variant="simple">
+
       <Thead>
+
         <Tr>
           <Th>Nombres</Th>
           <Th>Apellidos</Th>
@@ -27,8 +29,11 @@ export const SolicitantesTable = ({
           <Th>Acciones</Th>
           <Th>Consultas</Th>
         </Tr>
+        
       </Thead>
+
       <Tbody>
+
         {solicitantes.map((solicitante) => (
           <Tr key={solicitante.id}>
             <Td>{solicitante.nombre}</Td>
@@ -64,6 +69,7 @@ export const SolicitantesTable = ({
             </Td>
           </Tr>
         ))}
+
       </Tbody>
     </Table>
   );

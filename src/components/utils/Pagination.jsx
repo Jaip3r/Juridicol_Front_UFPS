@@ -11,7 +11,6 @@ export const Pagination = ({
 
     // Calculamos el total de páginas en base a los registros y el tamaño de páginas
     const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
-    console.log('paginas totales: ' + totalPages);
 
     // Determinamos si es móvil y ajustar tamaños
     const buttonSize = useBreakpointValue({ base: 'sm', md: 'md' });
