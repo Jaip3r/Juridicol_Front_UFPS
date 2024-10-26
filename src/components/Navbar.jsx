@@ -177,7 +177,7 @@ export const Navbar = () => {
                                             <List spacing={2}>
                                                 <ListItem>
                                                     <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                                    <Link href="#">Ver Solictantes</Link>
+                                                    <ChakraLink as={Link} to="/solicitantes">Ver solicitantes</ChakraLink>
                                                 </ListItem>
                                             </List>
                                         </AccordionPanel>
