@@ -86,7 +86,7 @@ export const EditSolicitanteForm = () => {
     barrio: yup.string()
       .required("El barrio o localidad de residencia es requerida")
       .min(5, "El barrio o localidad de residencia debe contener entre 5 y 25 carácteres")
-      .max(35, "El barrio o localidad de residencia debe contener entre 5 y 35 carácteres"),
+      .max(35, "El barrio o localidad de residencia debe contener entre 5 y 35 carácteres")
   })
 
   // Configuración de hook-form
@@ -94,7 +94,7 @@ export const EditSolicitanteForm = () => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors }
   } = useForm({ resolver: yupResolver(updateSolicitanteSchema) });
 
   // Estado para verificar la carga
@@ -118,7 +118,6 @@ export const EditSolicitanteForm = () => {
 
         const response = await axiosPrivate.get(`/solicitantes/${id}`);
         const solicitanteData = response?.data?.data;
-        console.log(solicitanteData);
 
         // Establecer los valores predeterminados del formulario
         for (const key in solicitanteData) {

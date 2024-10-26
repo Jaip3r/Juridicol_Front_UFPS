@@ -25,7 +25,7 @@ export const ChangePasswordForm = () => {
     const { register, 
         handleSubmit, 
         reset,
-        formState: { errors }, 
+        formState: { errors }
     } = useForm({ resolver: yupResolver(changePasswordSchema) });
 
     // Estado para el manejo del estado de la sesión

@@ -51,7 +51,7 @@ export const RegisterForm = () => {
     const { register, 
         handleSubmit, 
         reset,
-        formState: { errors }, 
+        formState: { errors }
     } = useForm({ resolver: yupResolver(registerUserSchema) });
 
     // Estado para el manejo del estado de la sesión

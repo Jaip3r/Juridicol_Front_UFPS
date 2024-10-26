@@ -52,7 +52,7 @@ export const EditUserForm = () => {
     const { register, 
         handleSubmit, 
         setValue,
-        formState: { errors }, 
+        formState: { errors }
     } = useForm({ resolver: yupResolver(updateUserSchema) });
 
     // Estado para verificar la carga

@@ -38,7 +38,7 @@ export const ResetPasswordForm = () => {
 
         }
 
-        const response = await toast.promise(
+        await toast.promise(
 
             axios.put('/auth/reset-password', body, {
                 headers:{
@@ -58,7 +58,6 @@ export const ResetPasswordForm = () => {
 
         );
 
-        console.log(response);
         navigate("/");
 
     });
