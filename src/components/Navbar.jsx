@@ -38,8 +38,8 @@ export const Navbar = () => {
     // onClose permite cerrar el Drawer
     const { isOpen, onOpen, onClose } = useDisclosure(); // Hook que permite manejar la apertura y cierre de elementos como el Drawer
 
-    const navigate = useNavigate();
     const logout = useLogout();
+    const navigate = useNavigate();
 
     const signOut = async () => {
         await logout();

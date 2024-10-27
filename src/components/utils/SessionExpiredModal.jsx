@@ -29,7 +29,7 @@ export const SessionExpiredModal = () => {
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme="red" onClick={handleLogin}>
-                        Iniciar Sesión
+                        Ok
                     </Button>
                 </ModalFooter>
             </ModalContent>
