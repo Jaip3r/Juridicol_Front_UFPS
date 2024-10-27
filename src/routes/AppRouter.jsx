@@ -14,6 +14,9 @@ import { Usuarios } from "../pages/admin/users/Usuarios";
 import { Register } from "../pages/admin/users/Register";
 import { UpdateUser } from "../pages/admin/users/UpdateUser";
 import { Home } from "../pages/student/Home";
+import { Solicitantes } from "../pages/admin/solicitantes/Solicitantes";
+import { InfoSolicitante } from "../pages/admin/solicitantes/InfoSolicitante";
+import { UpdateSolicitante } from "../pages/admin/solicitantes/UpdateSolicitante";
 
 
 export const AppRouter = () => {
@@ -47,6 +50,10 @@ export const AppRouter = () => {
                         <Route path="/register" element={<Register />}></Route>
                         <Route path="/users/:rol" element={<Usuarios />} />
                         <Route path="/users/edit/:id" element={<UpdateUser />} /> 
+
+                        <Route path="/solicitantes" element={<Solicitantes />} />
+                        <Route path="/solicitantes/info/:id" element={<InfoSolicitante />} />
+                        <Route path="/solicitantes/edit/:id" element={<UpdateSolicitante />} />
                     </Route>
 
                     {/* Ruta para manejar 404 (página no encontrada) y acceso no autorizado */}
