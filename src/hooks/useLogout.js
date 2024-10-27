@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { useAuth } from "./useAuth";
 import { useAxiosPrivate } from "./useAxiosPrivate";
 import { useSessionExpired } from "./useSessionExpired";
@@ -16,11 +17,18 @@ export const useLogout = () => {
         setPersist(false);
         localStorage.clear();
         setIsSessionExpired(false);
-
+            
         try {
-            await axiosPrivate.post('/auth/logout');
+
+            const response = await axiosPrivate.post('/auth/logout');
+
+            if (response?.status === 200) {
+                toast.success("Sesión finalizada correctamente, hasta pronto...");
+            }
+
         }catch(err) {
-            console.error(err);
+            if (err?.response?.status === 403 && err?.response?.data?.message === "Token de refresco inválido o revocado") toast.error('Sesión expirada');
+            else toast.error(`Sesión finalizada correctamente`);
         }
 
     }
