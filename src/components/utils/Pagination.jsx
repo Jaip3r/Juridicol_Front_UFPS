@@ -37,7 +37,7 @@ export const Pagination = ({
             </Button>
 
             <Text fontSize={fontSize}>
-                Página {currentPage} de {totalPages}
+                Página {currentPage} de {totalPages ? totalPages: 1}
             </Text>
 
             <Button

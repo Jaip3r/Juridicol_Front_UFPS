@@ -22,7 +22,14 @@ export const Solicitantes = () => {
   useEffect(() => {
 
     const handler = setTimeout(() => {
-      setDebounceSearchItem(searchItem);
+
+      // Validamos que el valor ingresado no contenga números
+      if (/^\D+$/.test(searchItem)) {
+        setDebounceSearchItem(searchItem);
+      } else {
+        setDebounceSearchItem('');
+      }
+
     }, 500);
 
     return () => {
@@ -214,6 +221,7 @@ export const Solicitantes = () => {
       ) : (
         <>
 
+          {/* Botón para generar informe */}
           <Button
             colorScheme="green"
             size="sm"
@@ -225,6 +233,7 @@ export const Solicitantes = () => {
             Generar Reporte
           </Button>
 
+          {/* Campo para busqueda por nombre y apellido */}
           <Stack spacing={4} direction={{ base: 'column', md: 'row' }} mb={4}>
             <InputGroup>
               <InputLeftElement pointerEvents='none'>
@@ -232,14 +241,14 @@ export const Solicitantes = () => {
               </InputLeftElement>
 
               <Input
-                placeholder="Buscar solicitante..."
+                placeholder="Ingrese los nombres o apellidos del solicitante..."
                 value={searchItem}
                 onChange={(e) => setSearchItem(e.target.value)}
               />
             </InputGroup>
           </Stack>
 
-          {/*Campos de filtrado*/}
+          {/* Campos de filtrado */}
           <Filters
             isMobile={isMobile}
             filters={filters}
@@ -269,6 +278,7 @@ export const Solicitantes = () => {
             loading={loading}
             onPageChange={handleFetchData}
           />
+          
         </>
       )}
     </PageLayout>

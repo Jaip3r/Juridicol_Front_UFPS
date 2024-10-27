@@ -49,7 +49,7 @@ export const useGenerateReport = ({
             onSuccess();
                     
         } catch (error) {
-            onError(error, "Error al generar archivo de reporte");
+            onError(error);
         } finally {
             setIsLoading(false);
         }

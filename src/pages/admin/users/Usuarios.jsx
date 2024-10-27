@@ -1,28 +1,99 @@
-import { Box, Flex, Spinner, Text, useBreakpointValue, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Flex, Input, InputGroup, InputLeftElement, Spinner, Stack, Text, useBreakpointValue, useDisclosure } from "@chakra-ui/react";
 import { PageLayout } from "../../../components/container/PageLayout";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSessionExpired } from "../../../hooks/useSessionExpired";
 import { useAxiosPrivate } from "../../../hooks/useAxiosPrivate";
 import { toast } from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { useFetchTableData } from "../../../hooks/useFetchTableData";
-import { UserFilters } from "../../../components/filters/UserFilters";
+import { Filters } from "../../../components/filters/Filters";
 import { UsersTable } from "../../../components/tables/UsersTable";
 import { Pagination } from "../../../components/utils/Pagination";
 import { ConfirmModal } from "../../../components/utils/ConfirmModal";
+import { FiSearch } from "react-icons/fi";
+import { useGenerateReport } from "../../../hooks/useGenerateReport";
 
 
 export const Usuarios = () => {
+
+  // Estado para el manejo de la búsqueda
+  const [searchItem, setSearchItem] = useState('');
+
+  // Debounce para el término de búsqueda
+  const [debounceSearchItem, setDebounceSearchItem] = useState(searchItem);
+
+  useEffect(() => {
+
+    const handler = setTimeout(() => {
+
+      // Validamos que el valor ingresado sea un número
+      if (/^\d+$/.test(searchItem)) {
+        setDebounceSearchItem(searchItem);
+      } else {
+        setDebounceSearchItem('');
+      }
+
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    }
+
+  }, [searchItem]);
 
   // Estados para el manejo de los filtros y recarga de datos
   const [filters, setFilters] = useState({
     area_derecho: '',
     grupo: '',
     activo: '',
-    order: 'asc',
+    order: '',
   });
   const [reloadData, setReloadData] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  // Memoizamos customParams para evitar cambios innecesarios
+  const customParams = useMemo(() => ({
+    ...filters,
+    searchItem: debounceSearchItem
+  }), [filters, debounceSearchItem]);
+
+  // Definimos los filtros a establecer
+  const filterDefinitions = [
+    {
+      key: "area_derecho",
+      placeholder: "Área de Derecho",
+      options: [
+        { value: "laboral", label: "Laboral" },
+        { value: "publico", label: "Público" },
+        { value: "civil", label: "Civil" },
+        { value: "penal", label: "Penal" },
+      ],
+    },
+    {
+      key: "grupo",
+      placeholder: "Grupo",
+      options: [
+        { value: "A", label: "A" },
+        { value: "B", label: "B" },
+      ],
+    },
+    {
+      key: "activo",
+      placeholder: "Estado",
+      options: [
+        { value: "true", label: "Habilitado" },
+        { value: "false", label: "Inhabilitado" },
+      ],
+    },
+    {
+      key: "order",
+      placeholder: "Orden",
+      options: [
+        { value: "asc", label: "Ascendente" },
+        { value: "desc", label: "Descendente" }
+      ]
+    }
+  ];
 
   // Elementos para el manejo del modal de alerta
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -55,6 +126,8 @@ export const Usuarios = () => {
       error?.response?.data?.message === "Token de refresco inválido o revocado"
     ) {
       setIsSessionExpired(true);
+    } else if (error?.response?.status === 400) {
+      toast.error(error?.response?.data?.message);
     } else {
       toast.error(errorMsg);
     }
@@ -70,8 +143,8 @@ export const Usuarios = () => {
   } = useFetchTableData({
     endpoint: '/users',
     initialParams: { rol: role },
-    dependencies: [role, filters, reloadData],
-    customParams: filters,
+    dependencies: [role, customParams, reloadData],
+    customParams,
     onError: handleError
   });
 
@@ -90,8 +163,7 @@ export const Usuarios = () => {
 
       // Realizamos la petición en base al estado del usuario
       const action = selectedUser.activo ? 'disable' : 'enable';
-      const response = await axiosPrivate.patch(`users/${action}/${selectedUser.id}`, {});
-      console.log(response);
+      await axiosPrivate.patch(`users/${action}/${selectedUser.id}`, {});
 
       // Actualizar el estado de usuarios después de la acción
       setReloadData((prev) => !prev);
@@ -115,6 +187,18 @@ export const Usuarios = () => {
   const handleFetchData = (direction = 'next') => {
     fetchData(direction, filters);
   };
+
+  // Hook para gestionar la generación del reporte
+  // Uso del hook personalizado
+  const { generateReport, isLoading: reportLoading } = useGenerateReport({
+    endpoint: '/users/report',
+    params: { rol: role, ...filters },
+    fileName: role === 'profesor' ? 'Reporte_Profesores.xlsx' : 'Reporte_Estudiantes.xlsx',
+    onError: (error) => {
+      handleError(error, 'Error al generar el reporte');
+    }
+  });
+
 
   // Determinar si estamos en una pantalla móvil
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -142,11 +226,39 @@ export const Usuarios = () => {
 
         <>
 
+          {/* Botón para generar informe */}
+          <Button
+            colorScheme="green"
+            size="sm"
+            onClick={generateReport}
+            isLoading={reportLoading}
+            loadingText="Generando..."
+            mb={4}
+          >
+            Generar Reporte
+          </Button>
+
+          {/* Campo para busqueda por código*/}
+          <Stack spacing={4} direction={{ base: 'column', md: 'row' }} mb={4}>
+            <InputGroup>
+              <InputLeftElement pointerEvents='none'>
+                <FiSearch color='black.300' />
+              </InputLeftElement>
+
+              <Input
+                placeholder={`Ingrese el código del ${role}...`}
+                value={searchItem}
+                onChange={(e) => setSearchItem(e.target.value)}
+              />
+            </InputGroup>
+          </Stack>
+
           { /*Campos de filtrado*/ }
-          <UserFilters
+          <Filters
             isMobile={isMobile}
             filters={filters}
             setFilters={setFilters}
+            filtersDefinitions={filterDefinitions}
           />
 
           <Flex

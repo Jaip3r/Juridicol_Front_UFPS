@@ -15,7 +15,7 @@ export const StatCard = ({ title, count, imageSrc, info }) => {
             w="100%"
         >
             <Image src={imageSrc} alt={title} boxSize="80px" mx="auto" mb={4} />
-            <Text fontSize="lg" fontWeight="bold">{title}</Text>
+            <Text fontSize="md" fontWeight="bold">{title}</Text>
             {
                 info !== "" && info !== null && info !== undefined
                     ?

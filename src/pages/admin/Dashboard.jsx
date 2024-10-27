@@ -36,7 +36,7 @@ export const Dashboard = () => {
 
             try {
 
-                const response = await axiosPrivate.get('/users/count');
+                const response = await axiosPrivate.get('/users/countUsersGroupByRol');
                 const data = response?.data?.data;
 
                 setInfo({
