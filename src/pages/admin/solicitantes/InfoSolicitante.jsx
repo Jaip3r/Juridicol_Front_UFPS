@@ -65,17 +65,16 @@ export const InfoSolicitante = () => {
                 lugar_nacimiento: data?.lugar_nacimiento,
                 discapacidad: data?.discapacidad,
                 vulnerabilidad: data?.vulnerabilidad,
+                ciudad: data?.ciudad,
                 direccion_actual: data?.direccion_actual,
                 email: data?.email,
                 numero_contacto: data?.numero_contacto,
                 nivel_estudio: data?.nivel_estudio,
                 estrato: data?.estrato,
                 sisben: data?.sisben,
+                actividad_economica: data?.actividad_economica,
                 oficio: data?.oficio,
-                nivel_ingreso_economico: data?.nivel_ingreso_economico,
-                departamento: data?.departamento,
-                ciudad: data?.ciudad,
-                barrio: data?.barrio
+                nivel_ingreso_economico: data?.nivel_ingreso_economico
             })
             
         } catch (error) {
@@ -135,6 +134,11 @@ export const InfoSolicitante = () => {
 
           {/* Formulario de perfil */}
           <Stack spacing={4} w="full" maxW={{ base: "full", md: "600px" }}>
+
+            {/* Título de la sección: Datos Básicos del Solicitante */}
+            <Text fontWeight="bold" fontSize="lg" mb={2} mt={6}>
+              Datos Básicos del Solicitante
+            </Text>
 
             {/* Nombres y Apellidos */}
             <Stack spacing={4} direction={{ base: "column", md: "row" }}>
@@ -236,7 +240,7 @@ export const InfoSolicitante = () => {
               </FormControl>
             </Stack>
 
-            {/* Vulnerabilidad y Dirección Actual */}
+            {/* Vulnerabilidad y Número de contacto */}
             <Stack spacing={4} direction={{ base: "column", md: "row" }}>
               <FormControl id="vulnerabilidad">
                 <FormLabel>Vulnerabilidad</FormLabel>
@@ -244,6 +248,32 @@ export const InfoSolicitante = () => {
                   type="text"
                   placeholder="Vulnerabilidad"
                   value={solicitanteData.vulnerabilidad}
+                  isReadOnly
+                  borderWidth="2px"
+                />
+              </FormControl>
+
+              {/* Número de contacto */}
+              <FormControl id="numero_contacto">
+                <FormLabel>Número de contacto</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="Número de contacto"
+                  value={solicitanteData.numero_contacto}
+                  isReadOnly
+                  borderWidth="2px"
+                />
+              </FormControl>
+            </Stack>
+
+            {/* Ciudad y dirección actual */}
+            <Stack spacing={4} direction={{ base: "column", md: "row" }}>
+              <FormControl id="ciudad">
+                <FormLabel>Ciudad</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="Ciudad"
+                  value={solicitanteData.ciudad}
                   isReadOnly
                   borderWidth="2px"
                 />
@@ -273,17 +303,12 @@ export const InfoSolicitante = () => {
               />
             </FormControl>
 
-            {/* Número de contacto */}
-            <FormControl id="numero_contacto">
-              <FormLabel>Número de contacto</FormLabel>
-              <Input
-                type="text"
-                placeholder="Número de contacto"
-                value={solicitanteData.numero_contacto}
-                isReadOnly
-                borderWidth="2px"
-              />
-            </FormControl>
+            
+
+            {/* Título de la sección: Caracterización Socioeconómica */}
+            <Text fontWeight="bold" fontSize="lg" mb={2} mt={6}>
+              Caracterización Socioeconómica
+            </Text>
 
             {/* Nivel de estudio y Estrato */}
             <Stack spacing={4} direction={{ base: "column", md: "row" }}>
@@ -348,41 +373,17 @@ export const InfoSolicitante = () => {
                 />
               </FormControl>
 
-              <FormControl id="departamento">
-                <FormLabel>Departamento</FormLabel>
+              <FormControl id="actividad_economica">
+                <FormLabel>Actividad económica</FormLabel>
                 <Input
                   type="text"
-                  placeholder="Departamento"
-                  value={solicitanteData.departamento}
+                  placeholder="Actividad económica"
+                  value={solicitanteData.actividad_economica}
                   isReadOnly
                   borderWidth="2px"
                 />
               </FormControl>
             </Stack>
-
-            {/* Ciudad */}
-            <FormControl id="ciudad">
-              <FormLabel>Ciudad</FormLabel>
-              <Input
-                type="text"
-                placeholder="Ciudad"
-                value={solicitanteData.ciudad}
-                isReadOnly
-                borderWidth="2px"
-              />
-            </FormControl>
-
-            {/* Barrio */}
-            <FormControl id="barrio">
-              <FormLabel>Barrio</FormLabel>
-              <Input
-                type="text"
-                placeholder="Barrio"
-                value={solicitanteData.barrio}
-                isReadOnly
-                borderWidth="2px"
-              />
-            </FormControl>
 
             <Stack
               justify="center"

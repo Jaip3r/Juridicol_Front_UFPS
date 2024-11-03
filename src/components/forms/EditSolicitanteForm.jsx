@@ -20,11 +20,11 @@ export const EditSolicitanteForm = () => {
     nombre: yup.string()
       .required("Los nombres son requeridos")
       .min(3, "El nombre debe contener mínimo 3 carácteres")
-      .max(30, "El nombre puede contener hasta máximo 30 carácteres"),
+      .max(60, "El nombre puede contener hasta máximo 60 carácteres"),
     apellidos: yup.string()
       .required("Los apellidos son requeridos")
       .min(3, "Los apellidos deben contener mínimo 3 carácteres")
-      .max(35, "Los apellidos pueden contener hasta máximo 35 carácteres"),
+      .max(65, "Los apellidos pueden contener hasta máximo 65 carácteres"),
     genero: yup.string()
       .required("El genero es requerido"),
     tipo_identificacion: yup.string()
@@ -36,35 +36,42 @@ export const EditSolicitanteForm = () => {
       .max(15, "El número de identificación debe contener entre 8 a 15 digitos"),
     fecha_nacimiento: yup.date()
       .required("La fecha de nacimiento es requerida")
-      .test("edad", "Debe ser mayor de 18 años", value => {
+      .transform((curr, originalValue) => originalValue === "" ? undefined : curr)  // Transformamos cadenas vacías en indefinido
+      .test("edad", "Debe ser mayor de 15 años y menor a 80 años", value => {
+        if (!value) return false; // Si es indefinido falla
         const fechaNacimiento = new Date(value);
         const fechaActual = new Date();
         const edad = fechaActual.getFullYear() - fechaNacimiento.getFullYear();
-        return edad >= 18;
+        return edad >= 15 && edad <= 80;
       }),
     lugar_nacimiento: yup.string()
       .required("El lugar de nacimiento es requerido")
       .min(3, "El lugar de nacimiento debe contener minimo 3 carácteres")
-      .max(35, "El lugar de nacimiento no debe sobrepasar los 35 carácteres"),
+      .max(65, "El lugar de nacimiento no debe sobrepasar los 65 carácteres"),
     discapacidad: yup.string()
       .required("El valor de discapacidad es requerido"),
     vulnerabilidad: yup.string()
       .required("El valor de vulnerabilidad es requerido"),
     email: yup.string()
       .optional()
-      .nullable()
       .email("El email debe corresponder con una dirección de correo válida")
-      .max(45, "El email no debe sobrepasar los 45 carácteres"),
+      .max(50, "El email no debe sobrepasar los 50 carácteres"),
+    ciudad: yup.string()
+      .required("La ciudad de residencia es requerida")
+      .min(5, "La ciudad de residencia debe contener entre 5 y 45 carácteres")
+      .max(45, "La ciudad de residencia debe contener entre 5 y 45 carácteres"),
     direccion_actual: yup.string()
       .required("La dirección actual es requerida")
       .min(5, "La dirección actual debe contener minimo 5 carácteres")
-      .max(55, "La dirección actual no debe sobrepasar los 55 carácteres"),
+      .max(65, "La dirección actual no debe sobrepasar los 65 carácteres"),
     sisben: yup.string()
       .required("El sisben es requerido"),
+    actividad_economica: yup.string()
+      .required("La actividad económica es requerida"),
     oficio: yup.string()
       .required("El oficio es requerido")
       .min(5, "El oficio debe contener minimo 5 carácteres")
-      .max(35, "El oficio no debe sobrepasar los 35 carácteres"),
+      .max(55, "El oficio no debe sobrepasar los 55 carácteres"),
     numero_contacto: yup.string()
       .required("El número de contacto es requerido")
       .matches(/^\d+$/, "El número de contacto debe contener solo números")
@@ -74,19 +81,7 @@ export const EditSolicitanteForm = () => {
     estrato: yup.string()
       .required("El valor de estrato es requerido"),
     nivel_ingreso_economico: yup.string()
-      .required("El nivel de ingreso económico es requerido"),
-    departamento: yup.string()
-      .required("El departamento de residencia es requerido")
-      .min(5, "El departamento de residencia debe contener entre 5 y 25 carácteres")
-      .max(35, "El departamento de residencia debe contener entre 5 y 35 carácteres"),
-    ciudad: yup.string()
-      .required("La ciudad de residencia es requerida")
-      .min(5, "La ciudad de residencia debe contener entre 5 y 20 carácteres")
-      .max(35, "La ciudad de residencia debe contener entre 5 y 35 carácteres"),
-    barrio: yup.string()
-      .required("El barrio o localidad de residencia es requerida")
-      .min(5, "El barrio o localidad de residencia debe contener entre 5 y 25 carácteres")
-      .max(35, "El barrio o localidad de residencia debe contener entre 5 y 35 carácteres")
+      .required("El nivel de ingreso económico es requerido")
   })
 
   // Configuración de hook-form
@@ -95,7 +90,7 @@ export const EditSolicitanteForm = () => {
     handleSubmit,
     setValue,
     formState: { errors }
-  } = useForm({ resolver: yupResolver(updateSolicitanteSchema) });
+  } = useForm({ resolver: yupResolver(updateSolicitanteSchema), mode: "onChange" });
 
   // Estado para verificar la carga
   const [loading, setLoading] = useState(false);
@@ -122,7 +117,7 @@ export const EditSolicitanteForm = () => {
         // Establecer los valores predeterminados del formulario
         for (const key in solicitanteData) {
           if (Object.prototype.hasOwnProperty.call(solicitanteData, key)) {
-            setValue(key, solicitanteData[key]);
+            setValue(key, solicitanteData[key] || '');
           }
         }
 
@@ -149,17 +144,13 @@ export const EditSolicitanteForm = () => {
 
     data.fecha_nacimiento = format(new Date(data.fecha_nacimiento), "yyyy-MM-dd");
 
-    // Creamos un nuevo objeto de datos, excluyendo email si es nulo
-    const filteredData = { ...data };
-    if (filteredData.email === null || filteredData.email === '') {
-      delete filteredData.email;
-    }
+    console.log(data);
 
     try {
 
       const response = await toast.promise(
 
-        axiosPrivate.patch(`/solicitantes/${id}`, filteredData, {
+        axiosPrivate.patch(`/solicitantes/${id}`, data, {
           headers: {
             "Content-Type": "application/json"
           }
@@ -231,11 +222,16 @@ export const EditSolicitanteForm = () => {
           <form onSubmit={onSubmit}>
             <Stack spacing={4} w="full" maxW={{ base: "full", md: "600px" }}>
 
+              {/* Título de la sección: Datos Básicos del Solicitante */}
+              <Text fontWeight="bold" fontSize="lg" mb={2} mt={6}>
+                Datos Básicos del Solicitante
+              </Text>
+
               {/* Nombres, Apellidos y Genero */}
               <Stack spacing={4} direction={{ base: "column", md: "row" }}>
 
-                <FormControl id="nombre" isInvalid={errors.nombre}>
-                  <FormLabel htmlFor="nombre">Nombres *</FormLabel>
+                <FormControl id="nombre" isRequired isInvalid={errors.nombre}>
+                  <FormLabel htmlFor="nombre">Nombres</FormLabel>
                   <Input
                     type="text"
                     id="nombre"
@@ -247,8 +243,8 @@ export const EditSolicitanteForm = () => {
                   <FormErrorMessage>{errors.nombre?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl id="apellidos" isInvalid={errors.apellidos}>
-                  <FormLabel htmlFor="apellidos">Apellidos *</FormLabel>
+                <FormControl id="apellidos" isRequired isInvalid={errors.apellidos}>
+                  <FormLabel htmlFor="apellidos">Apellidos</FormLabel>
                   <Input
                     type="text"
                     id="apellidos"
@@ -262,8 +258,8 @@ export const EditSolicitanteForm = () => {
                   </FormErrorMessage>
                 </FormControl>
 
-                <FormControl id="genero" isInvalid={errors.genero}>
-                  <FormLabel htmlFor="genero">Genero *</FormLabel>
+                <FormControl id="genero" isRequired isInvalid={errors.genero}>
+                  <FormLabel htmlFor="genero">Genero</FormLabel>
                   <Select
                     placeholder="Seleccione el genero"
                     id="genero"
@@ -271,6 +267,8 @@ export const EditSolicitanteForm = () => {
                   >
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
+                    <option value="No binario">No binario</option>
+                    <option value="Transgenero">Transgenero</option>
                     <option value="Otro">Otro</option>
                   </Select>
                   <FormErrorMessage>{errors.genero?.message}</FormErrorMessage>
@@ -281,8 +279,8 @@ export const EditSolicitanteForm = () => {
               {/* Tipo y Número de identificación */}
               <Stack spacing={4} direction={{ base: "column", md: "row" }}>
 
-                <FormControl id="tipo_identificacion" isInvalid={errors.tipo_identificacion}>
-                  <FormLabel htmlFor="tipo_identificacion">Tipo de identificación *</FormLabel>
+                <FormControl id="tipo_identificacion" isRequired isInvalid={errors.tipo_identificacion}>
+                  <FormLabel htmlFor="tipo_identificacion">Tipo de identificación</FormLabel>
                   <Select
                     placeholder="Seleccione el tipo de identificación"
                     id="tipo_identificacion"
@@ -299,8 +297,8 @@ export const EditSolicitanteForm = () => {
                   <FormErrorMessage>{errors.tipo_identificacion?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl id="numero_identificacion" isInvalid={errors.numero_identificacion}>
-                  <FormLabel htmlFor="numero_identificacion">Número de identificación *</FormLabel>
+                <FormControl id="numero_identificacion" isRequired isInvalid={errors.numero_identificacion}>
+                  <FormLabel htmlFor="numero_identificacion">Número de identificación</FormLabel>
                   <Input
                     type="text"
                     id="numero_identificacion"
@@ -317,8 +315,8 @@ export const EditSolicitanteForm = () => {
               {/* Fecha de nacimiento y Lugar de nacimiento */}
               <Stack spacing={4} direction={{ base: "column", md: "row" }}>
 
-                <FormControl id="fecha_nacimiento" isInvalid={errors.fecha_nacimiento}>
-                  <FormLabel htmlFor="fecha_nacimiento">Fecha de nacimiento *</FormLabel>
+                <FormControl id="fecha_nacimiento" isRequired isInvalid={errors.fecha_nacimiento}>
+                  <FormLabel htmlFor="fecha_nacimiento">Fecha de nacimiento</FormLabel>
                   <Input
                     type="date"
                     id="fecha_nacimiento"
@@ -330,8 +328,8 @@ export const EditSolicitanteForm = () => {
                   <FormErrorMessage>{errors.fecha_nacimiento?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl id="lugar_nacimiento" isInvalid={errors.lugar_nacimiento}>
-                  <FormLabel htmlFor="lugar_nacimiento">Lugar de nacimiento *</FormLabel>
+                <FormControl id="lugar_nacimiento" isRequired isInvalid={errors.lugar_nacimiento}>
+                  <FormLabel htmlFor="lugar_nacimiento">Lugar de nacimiento</FormLabel>
                   <Input
                     type="text"
                     id="lugar_nacimiento"
@@ -345,47 +343,63 @@ export const EditSolicitanteForm = () => {
 
               </Stack>
 
-              {/* Discapacidad */}
-              <FormControl id="discapacidad" isInvalid={errors.discapacidad}>
-                <FormLabel htmlFor="discapacidad">Discapacidad *</FormLabel>
-                <Select
-                  placeholder="Seleccione el tipo de discapacidad"
-                  id="discapacidad"
-                  {...register("discapacidad")}
-                >
-                  <option value="Ninguna">Ninguna</option>
-                  <option value="Física">Física</option>
-                  <option value="Intelectual">Intelectual</option>
-                  <option value="Mental">Mental</option>
-                  <option value="Psicosocial">Psicosocial</option>
-                  <option value="Múltiple">Múltiple</option>
-                  <option value="Sensorial">Sensorial</option>
-                  <option value="Auditiva">Auditiva</option>
-                </Select>
-                <FormErrorMessage>{errors.discapacidad?.message}</FormErrorMessage>
-              </FormControl>
+              {/* Discapacidad, Vulnerabilidad y Número de contacto */}
+              <Stack spacing={4} direction={{ base: "column", md: "row" }}>
 
-              {/* Vulnerabilidad */}
-              <FormControl id="vulnerabilidad" isInvalid={errors.vulnerabilidad}>
-                <FormLabel htmlFor="vulnerabilidad">Vulnerabilidad *</FormLabel>
-                <Select
-                  placeholder="Seleccione el tipo de vulnerabilidad"
-                  id="vulnerabilidad"
-                  {...register("vulnerabilidad")}
-                >
-                  <option value="Ninguna">Ninguna</option>
-                  <option value="Persona con discapacidad">Persona con discapacidad</option>
-                  <option value="Grupos étnicos">Grupos étnicos</option>
-                  <option value="Mujer cabeza de hogar">Mujer cabeza de hogar</option>
-                  <option value="Reintegrados">Reintegrados</option>
-                  <option value="Adulto mayor">Adulto mayor</option>
-                  <option value="Victima del conflicto">Victima del conflicto</option>
-                  <option value="Población desplazada">Población desplazada</option>
-                </Select>
-                <FormErrorMessage>{errors.vulnerabilidad?.message}</FormErrorMessage>
-              </FormControl>
+                <FormControl id="discapacidad" isRequired isInvalid={errors.discapacidad}>
+                  <FormLabel htmlFor="discapacidad">Discapacidad</FormLabel>
+                  <Select
+                    placeholder="Seleccione el tipo de discapacidad"
+                    id="discapacidad"
+                    {...register("discapacidad")}
+                  >
+                    <option value="Ninguna">Ninguna</option>
+                    <option value="Física">Física</option>
+                    <option value="Intelectual">Intelectual</option>
+                    <option value="Mental">Mental</option>
+                    <option value="Psicosocial">Psicosocial</option>
+                    <option value="Múltiple">Múltiple</option>
+                    <option value="Sensorial">Sensorial</option>
+                    <option value="Auditiva">Auditiva</option>
+                  </Select>
+                  <FormErrorMessage>{errors.discapacidad?.message}</FormErrorMessage>
+                </FormControl>
 
-              {/* Email y dirección actual */}
+                <FormControl id="vulnerabilidad" isRequired isInvalid={errors.vulnerabilidad}>
+                  <FormLabel htmlFor="vulnerabilidad">Vulnerabilidad</FormLabel>
+                  <Select
+                    placeholder="Seleccione el tipo de vulnerabilidad"
+                    id="vulnerabilidad"
+                    {...register("vulnerabilidad")}
+                  >
+                    <option value="Ninguna">Ninguna</option>
+                    <option value="Persona con discapacidad">Persona con discapacidad</option>
+                    <option value="Grupos étnicos">Grupos étnicos</option>
+                    <option value="Mujer cabeza de hogar">Mujer cabeza de hogar</option>
+                    <option value="Reintegrados">Reintegrados</option>
+                    <option value="Adulto mayor">Adulto mayor</option>
+                    <option value="Victima del conflicto">Victima del conflicto</option>
+                    <option value="Población desplazada">Población desplazada</option>
+                  </Select>
+                  <FormErrorMessage>{errors.vulnerabilidad?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl id="numero_contacto" isRequired isInvalid={errors.numero_contacto}>
+                  <FormLabel htmlFor="numero_contacto">Número de contacto</FormLabel>
+                  <Input
+                    type="text"
+                    id="numero_contacto"
+                    placeholder="Número de contacto"
+                    borderWidth="2px"
+                    autoComplete="off"
+                    {...register("numero_contacto")}
+                  />
+                  <FormErrorMessage>{errors.numero_contacto?.message}</FormErrorMessage>
+                </FormControl>
+
+              </Stack>
+
+              {/* Email y ciudad */}
               <Stack spacing={4} direction={{ base: "column", md: "row" }}>
 
                 <FormControl id="email" isInvalid={errors.email}>
@@ -401,8 +415,24 @@ export const EditSolicitanteForm = () => {
                   <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl id="direccion_actual" isInvalid={errors.direccion_actual}>
-                  <FormLabel htmlFor="direccion_actual">Dirección actual *</FormLabel>
+                <FormControl id="ciudad" isRequired isInvalid={errors.ciudad}>
+                  <FormLabel htmlFor="ciudad">Ciudad</FormLabel>
+                  <Input
+                    type="text"
+                    id="ciudad"
+                    placeholder="Ciudad"
+                    borderWidth="2px"
+                    autoComplete="off"
+                    {...register("ciudad")}
+                  />
+                  <FormErrorMessage>{errors.ciudad?.message}</FormErrorMessage>
+                </FormControl>
+
+              </Stack>
+
+              {/* Dirección actual */}
+              <FormControl id="direccion_actual" isRequired isInvalid={errors.direccion_actual}>
+                  <FormLabel htmlFor="direccion_actual">Dirección actual</FormLabel>
                   <Input
                     type="text"
                     id="direccion_actual"
@@ -412,15 +442,18 @@ export const EditSolicitanteForm = () => {
                     {...register("direccion_actual")}
                   />
                   <FormErrorMessage>{errors.direccion_actual?.message}</FormErrorMessage>
-                </FormControl>
+              </FormControl>
 
-              </Stack>
+              {/* Título de la sección: Caracterización Socioeconómica */}
+              <Text fontWeight="bold" fontSize="lg" mb={2} mt={6}>
+                Caracterización Socioeconómica
+              </Text>
 
-              {/* Sisben y Oficio */}
+              {/* Sisben y Nivel de ingreso económico */}
               <Stack spacing={4} direction={{ base: "column", md: "row" }}>
 
-                <FormControl id="sisben" isInvalid={errors.sisben}>
-                  <FormLabel htmlFor="sisben">Sisben *</FormLabel>
+                <FormControl id="sisben" isRequired isInvalid={errors.sisben}>
+                  <FormLabel htmlFor="sisben">Sisben</FormLabel>
                   <Select
                     placeholder="Seleccione el sisben"
                     id="sisben"
@@ -435,38 +468,28 @@ export const EditSolicitanteForm = () => {
                   <FormErrorMessage>{errors.sisben?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl id="oficio" isInvalid={errors.oficio}>
-                  <FormLabel htmlFor="oficio">Oficio *</FormLabel>
-                  <Input
-                    type="text"
-                    placeholder="Oficio"
-                    borderWidth="2px"
-                    autoComplete="off"
-                    {...register("oficio")}
-                  />
-                  <FormErrorMessage>{errors.oficio?.message}</FormErrorMessage>
+                <FormControl id="nivel_ingreso_economico" isRequired isInvalid={errors.nivel_ingreso_economico}>
+                  <FormLabel htmlFor="nivel_ingreso_economico">Nivel de ingreso económico</FormLabel>
+                  <Select
+                    placeholder="Seleccione el nivel de ingreso económico"
+                    id="nivel_ingreso_economico"
+                    {...register("nivel_ingreso_economico")}
+                  >
+                    <option value="0 - 1 SMMV">0 - 1 SMMV</option>
+                    <option value="1 - 2 SMMV">1 - 2 SMMV</option>
+                    <option value="2 - 3 SMMV">2 - 3 SMMV</option>
+                    <option value="Superior a 3 SMMV">Superior a 3 SMMV</option>
+                  </Select>
+                  <FormErrorMessage>{errors.nivel_ingreso_economico?.message}</FormErrorMessage>
                 </FormControl>
 
               </Stack>
 
-              {/* Número de contacto, Nivel de estudio, Estrato */}
+              {/* Nivel de estudio, Estrato */}
               <Stack spacing={4} direction={{ base: "column", md: "row" }}>
 
-                <FormControl id="numero_contacto" isInvalid={errors.numero_contacto}>
-                  <FormLabel htmlFor="numero_contacto">Número de contacto *</FormLabel>
-                  <Input
-                    type="text"
-                    id="numero_contacto"
-                    placeholder="Número de contacto"
-                    borderWidth="2px"
-                    autoComplete="off"
-                    {...register("numero_contacto")}
-                  />
-                  <FormErrorMessage>{errors.numero_contacto?.message}</FormErrorMessage>
-                </FormControl>
-
-                <FormControl id="nivel_estudio" isInvalid={errors.nivel_estudio}>
-                  <FormLabel>Nivel de estudio *</FormLabel>
+                <FormControl id="nivel_estudio" isRequired isInvalid={errors.nivel_estudio}>
+                  <FormLabel>Nivel de estudio</FormLabel>
                   <Select
                     placeholder="Seleccione el nivel de estudio"
                     id="nivel_estudio"
@@ -483,13 +506,14 @@ export const EditSolicitanteForm = () => {
                   <FormErrorMessage>{errors.nivel_estudio?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl id="estrato" isInvalid={errors.estrato}>
-                  <FormLabel htmlFor="estrato">Estrato *</FormLabel>
+                <FormControl id="estrato" isRequired isInvalid={errors.estrato}>
+                  <FormLabel htmlFor="estrato">Estrato</FormLabel>
                   <Select
                     placeholder="Seleccione el estrato"
                     id="estrato"
                     {...register("estrato")}
                   >
+                    <option value="Estrato 0">Estrato 0</option>
                     <option value="Estrato 1">Estrato 1</option>
                     <option value="Estrato 2">Estrato 2</option>
                     <option value="Estrato 3">Estrato 3</option>
@@ -502,69 +526,56 @@ export const EditSolicitanteForm = () => {
 
               </Stack>
 
-              {/* Nivel de ingreso económico y Departamento */}
-              <Stack spacing={4} direction={{ base: "column", md: "row" }}>
+              {/* Oficio */}
+              <FormControl id="oficio" isRequired isInvalid={errors.oficio}>
+                  <FormLabel htmlFor="oficio">Oficio</FormLabel>
+                  <Input
+                    type="text"
+                    placeholder="Oficio"
+                    borderWidth="2px"
+                    autoComplete="off"
+                    {...register("oficio")}
+                  />
+                  <FormErrorMessage>{errors.oficio?.message}</FormErrorMessage>
+              </FormControl>
 
-                <FormControl id="nivel_ingreso_economico" isInvalid={errors.nivel_ingreso_economico}>
-                  <FormLabel htmlFor="nivel_ingreso_economico">Nivel de ingreso económico *</FormLabel>
+              {/* Actividad económica */}
+              <FormControl id="actividad_economica" isRequired isInvalid={errors.actividad_economica}>
+                  <FormLabel fontSize={{ md: "sm", lg: "md" }} htmlFor="actividad_economica">Actividad económica</FormLabel>
                   <Select
-                    placeholder="Seleccione el nivel de ingreso económico"
-                    id="nivel_ingreso_economico"
-                    {...register("nivel_ingreso_economico")}
+                    placeholder="Seleccione la actividad económica"
+                    id="actividad_economica"
+                    {...register("actividad_economica")}
                   >
-                    <option value="0 - 3 SMMV">0 - 3 SMMV</option>
-                    <option value="3 - 6 SMMV">3 - 6 SMMV</option>
-                    <option value="Superior a 6 SMMV">Superior a 6 SMMV</option>
+                    <option value="Agricultura, ganadería, caza, silvicultura y pesca">Agricultura, ganadería, caza, silvicultura y pesca</option>
+                    <option value="Explotación de minas y canteras">Explotación de minas y canteras</option>
+                    <option value="Industria Manufacturera">Industria Manufacturera</option>
+                    <option value="Suministro de electricidad, gas, vapor y aire acondicionado">Suministro de electricidad, gas, vapor y aire acondicionado</option>
+                    <option value="Suministro de agua, alcantarillado, gestión de desechos">Suministro de agua, alcantarillado y gestión de desechos</option>
+                    <option value="Actividades de saneamiento">Actividades de saneamiento</option>
+                    <option value="Construcción">Construcción</option>
+                    <option value="Comercio al por mayor y al por menor">Comercio al por mayor y al por menor</option>
+                    <option value="Reparación de vehículos automotores y motocicletas">Reparación de vehículos automotores y motocicletas</option>
+                    <option value="Transporte y almacenamiento">Transporte y almacenamiento</option>
+                    <option value="Alojamiento y servicios de comida">Alojamiento y servicios de comida</option>
+                    <option value="Información y comunicación">Información y comunicación</option>
+                    <option value="Actividades financieras y de seguros">Actividades financieras y de seguros</option>
+                    <option value="Actividades inmobiliarias">Actividades inmobiliarias</option>
+                    <option value="Actividades profesionales, científicas y técnicas">Actividades profesionales, científicas y técnicas</option>
+                    <option value="Actividades administrativas y servicios de apoyo">Actividades administrativas y servicios de apoyo</option>
+                    <option value="Administración pública y defensa">Administración pública y defensa</option>
+                    <option value="Planes de seguro social obligatorio">Planes de seguro social obligatorio</option>
+                    <option value="Enseñanza">Enseñanza</option>
+                    <option value="Salud humana y servicios sociales">Salud humana y servicios sociales</option>
+                    <option value="Arte, entretenimiento y recreación">Arte, entretenimiento y recreación</option>
+                    <option value="Actividades de los hogares como empleadores de personal doméstico">Actividades de los hogares como empleadores de personal doméstico</option>
+                    <option value="Actividades de los hogares como productores de bienes o servicios para uso propio">Actividades de los hogares como productores de bienes o servicios para uso propio</option>
+                    <option value="Actividades de organizaciones y organismos extraterritoriales">Actividades de organizaciones y organismos extraterritoriales</option>
+                    <option value="Otras actividades de servicios">Otras actividades de servicios</option>
                   </Select>
-                  <FormErrorMessage>{errors.nivel_ingreso_economico?.message}</FormErrorMessage>
-                </FormControl>
-
-                <FormControl id="departamento" isInvalid={errors.departamento}>
-                  <FormLabel htmlFor="departamento">Departamento *</FormLabel>
-                  <Input
-                    type="text"
-                    id="departamento"
-                    placeholder="Departamento"
-                    borderWidth="2px"
-                    autoComplete="off"
-                    {...register("departamento")}
-                  />
-                  <FormErrorMessage>{errors.departamento?.message}</FormErrorMessage>
-                </FormControl>
-
-              </Stack>
-
-              {/* Ciudad y Barrio */}
-              <Stack spacing={4} direction={{ base: "column", md: "row" }}>
-
-                <FormControl id="ciudad" isInvalid={errors.ciudad}>
-                  <FormLabel htmlFor="ciudad">Ciudad *</FormLabel>
-                  <Input
-                    type="text"
-                    id="ciudad"
-                    placeholder="Ciudad"
-                    borderWidth="2px"
-                    autoComplete="off"
-                    {...register("ciudad")}
-                  />
-                  <FormErrorMessage>{errors.ciudad?.message}</FormErrorMessage>
-                </FormControl>
-
-                <FormControl id="barrio" isInvalid={errors.barrio}>
-                  <FormLabel htmlFor="barrio">Barrio *</FormLabel>
-                  <Input
-                    type="text"
-                    id="barrio"
-                    placeholder="Barrio"
-                    borderWidth="2px"
-                    autoComplete="off"
-                    {...register("barrio")}
-                  />
-                  <FormErrorMessage>{errors.barrio?.message}</FormErrorMessage>
-                </FormControl>
-
-              </Stack>
-
+                  <FormErrorMessage>{errors.actividad_economica?.message}</FormErrorMessage>
+              </FormControl>
+              
               <Stack justify="center" direction={{ base: "column", sm: "row" }} spacing={4} mt={6}>
                 <Button colorScheme="red" type="submit">Guardar</Button>
               </Stack>

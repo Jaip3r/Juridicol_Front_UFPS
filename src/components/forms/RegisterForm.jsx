@@ -15,11 +15,11 @@ export const RegisterForm = () => {
         nombres: yup.string()
             .required("Los nombres son requeridos")
             .min(3, "Los nombres deben contener mínimo 3 carácteres")
-            .max(25, "Los nombres pueden contener hasta máximo 25 carácteres"),
+            .max(45, "Los nombres pueden contener hasta máximo 45 carácteres"),
         apellidos: yup.string()
             .required("Los apellidos son requeridos")
             .min(3, "Los apellidos deben contener mínimo 3 carácteres")
-            .max(25, "Los apellidos pueden contener hasta máximo 25 carácteres"),
+            .max(55, "Los apellidos pueden contener hasta máximo 55 carácteres"),
         celular: yup.string()
             .required("El celular de contacto es requerido")
             .matches(/^\d+$/, "El celular debe contener solo números")
@@ -52,7 +52,7 @@ export const RegisterForm = () => {
         handleSubmit, 
         reset,
         formState: { errors }
-    } = useForm({ resolver: yupResolver(registerUserSchema) });
+    } = useForm({ resolver: yupResolver(registerUserSchema), mode: "onChange" });
 
     // Estado para el manejo del estado de la sesión
     const { setIsSessionExpired } = useSessionExpired();
@@ -125,36 +125,36 @@ export const RegisterForm = () => {
 
                     {/* Nombres y Apellidos */}
                     <Stack spacing={4} direction={{ base: "column", md: "row" }}>
-                        <FormControl id="nombres" isInvalid={errors.nombres}>
-                            <FormLabel htmlFor="nombres">Nombres *</FormLabel>
+                        <FormControl id="nombres" isRequired isInvalid={errors.nombres}>
+                            <FormLabel htmlFor="nombres">Nombres</FormLabel>
                             <Input type="text" id="nombres" placeholder="Nombres" borderWidth="2px" autoComplete="off" {...register("nombres")} />
                             <FormErrorMessage>{errors.nombres?.message}</FormErrorMessage>
                         </FormControl>
 
-                        <FormControl id="apellidos" isInvalid={errors.apellidos}>
-                            <FormLabel htmlFor="apellidos">Apellidos *</FormLabel>
+                        <FormControl id="apellidos" isRequired isInvalid={errors.apellidos}>
+                            <FormLabel htmlFor="apellidos">Apellidos</FormLabel>
                             <Input type="text" id="apellidos" placeholder="Apellidos" borderWidth="2px" autoComplete="off" {...register("apellidos")} />
                             <FormErrorMessage>{errors.apellidos?.message}</FormErrorMessage>
                         </FormControl>
                     </Stack>
 
                     {/* Celular */}
-                    <FormControl id="celular" isInvalid={errors.celular}>
-                        <FormLabel htmlFor="celular">Celular *</FormLabel>
+                    <FormControl id="celular" isRequired isInvalid={errors.celular}>
+                        <FormLabel htmlFor="celular">Celular</FormLabel>
                         <Input type="text" id="celular" placeholder="Celular" borderWidth="2px" autoComplete="off" {...register("celular")} />
                         <FormErrorMessage>{errors.celular?.message}</FormErrorMessage>
                     </FormControl>
 
                     {/* Email */}
-                    <FormControl id="email" isInvalid={errors.email}>
-                        <FormLabel htmlFor="email">Email *</FormLabel>
+                    <FormControl id="email" isRequired isInvalid={errors.email}>
+                        <FormLabel htmlFor="email">Email</FormLabel>
                         <Input type="email" id="email" placeholder="Email" borderWidth="2px" autoComplete="off" {...register("email")} />
                         <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                     </FormControl>
 
                     {/* Contraseña */}
-                    <FormControl id="password" isInvalid={errors.password}>
-                        <FormLabel htmlFor="password">Contraseña *</FormLabel>
+                    <FormControl id="password" isRequired isInvalid={errors.password}>
+                        <FormLabel htmlFor="password">Contraseña</FormLabel>
                         <InputGroup>
                             <Input
                                 type={show ? 'text' : 'password'}
@@ -175,14 +175,14 @@ export const RegisterForm = () => {
 
                     {/* Código y Rol */}
                     <Stack spacing={4} direction={{ base: "column", md: "row" }}>
-                        <FormControl id="codigo" isInvalid={errors.codigo}>
-                            <FormLabel htmlFor="codigo">Código *</FormLabel>
+                        <FormControl id="codigo" isRequired isInvalid={errors.codigo}>
+                            <FormLabel htmlFor="codigo">Código</FormLabel>
                             <Input type="text" id="codigo" placeholder="Código" borderWidth="2px" autoComplete="off" {...register("codigo")} />
                             <FormErrorMessage>{errors.codigo?.message}</FormErrorMessage>
                         </FormControl>
 
-                        <FormControl id="rol" isInvalid={errors.rol}>
-                            <FormLabel htmlFor="rol">Rol *</FormLabel>
+                        <FormControl id="rol" isRequired isInvalid={errors.rol}>
+                            <FormLabel htmlFor="rol">Rol</FormLabel>
                             <Select
                                 placeholder="Seleccione el rol"
                                 id="rol"
@@ -197,8 +197,8 @@ export const RegisterForm = () => {
 
                     {/* Área de Derecho y Grupo */}
                     <Stack spacing={4} direction={{ base: "column", md: "row" }}>
-                        <FormControl id="area_derecho" isInvalid={errors.area_derecho}>
-                            <FormLabel htmlFor="area_derecho">Área de Derecho *</FormLabel>
+                        <FormControl id="area_derecho" isRequired isInvalid={errors.area_derecho}>
+                            <FormLabel htmlFor="area_derecho">Área de Derecho</FormLabel>
                             <Select
                                 placeholder="Seleccione un área"
                                 id="area_derecho"
@@ -212,8 +212,8 @@ export const RegisterForm = () => {
                             <FormErrorMessage>{errors.area_derecho?.message}</FormErrorMessage>
                         </FormControl>
 
-                        <FormControl id="grupo" isInvalid={errors.grupo}>
-                            <FormLabel htmlFor="grupo">Grupo *</FormLabel>
+                        <FormControl id="grupo" isRequired isInvalid={errors.grupo}>
+                            <FormLabel htmlFor="grupo">Grupo</FormLabel>
                             <Select
                                 placeholder="Seleccione un grupo"
                                 id="grupo"

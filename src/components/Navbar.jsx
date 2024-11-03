@@ -200,7 +200,7 @@ export const Navbar = () => {
                                             <List spacing={2}>
                                                 <ListItem>
                                                     <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                                    <Link href="#">Recepción Consulta</Link>
+                                                    <ChakraLink as={Link} to="/recepcion-consulta">Recepción Consulta</ChakraLink>
                                                 </ListItem>
                                                 <ListItem>
                                                     <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
