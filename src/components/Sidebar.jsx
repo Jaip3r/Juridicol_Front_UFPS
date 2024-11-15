@@ -126,11 +126,23 @@ export const Sidebar = () => {
                                     </ListItem>
                                     <ListItem>
                                         <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                        <Link href="#">Ver Consulta Diaria</Link>
+                                        <ChakraLink as={Link} to="/procesos/consulta/diaria/pendiente">Ver Consulta Diaria</ChakraLink>
                                     </ListItem>
                                     <ListItem>
                                         <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                        <Link href="#">Ver Consulta Global</Link>
+                                        <ChakraLink as={Link} to="/procesos/consulta/global/pendiente">Ver Consulta Pendiente</ChakraLink>
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <ChakraLink as={Link} to="/procesos/consulta/global/asignada">Ver Consulta Asignada</ChakraLink>
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <ChakraLink as={Link} to="/procesos/consulta/global/finalizada">Ver Consulta Finalizada</ChakraLink>
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <Link href="#">Ver Asesoria Verbal</Link>
                                     </ListItem>
                                 </List>
                             </AccordionPanel>

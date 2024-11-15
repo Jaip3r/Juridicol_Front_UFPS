@@ -119,7 +119,7 @@ const registerConsultaSchema = yup.object().shape({
         .transform((value) => (value === '' ? undefined : value))
         .min(5, "La dirección del accionado debe contener minimo 5 carácteres")
         .max(60, "La dirección del accionado no debe sobrepasar los 60 carácteres"),
-    hechosRelevantes: yup.string()
+    hechos: yup.string()
         .required("Los hechos relevantes de la consulta son requeridos")
         .min(5, "Mínimo 5 carácteres")
         .max(1200, "Máximo 1200 carácteres"),
@@ -734,17 +734,17 @@ export const RegisterConsultaForm = () => {
                         Datos de la consulta
                     </Text>
 
-                    <FormControl id="hechosRelevantes" isRequired isInvalid={errors.hechosRelevantes}>
-                        <FormLabel fontSize={{ md: "sm", lg: "md" }} htmlFor="hechosRelevantes">Hechos relevantes</FormLabel>
+                    <FormControl id="hechos" isRequired isInvalid={errors.hechos}>
+                        <FormLabel fontSize={{ md: "sm", lg: "md" }} htmlFor="hechos">Hechos relevantes</FormLabel>
                         <Textarea
-                            id="hechosRelevantes"
+                            id="hechos"
                             placeholder="1."
                             borderWidth="2px"
                             height="120px"
                             resize="none"
-                            {...register("hechosRelevantes")}
+                            {...register("hechos")}
                         />
-                        <FormErrorMessage>{errors.hechosRelevantes?.message}</FormErrorMessage>
+                        <FormErrorMessage>{errors.hechos?.message}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl id="pretensiones" isRequired isInvalid={errors.pretensiones}>

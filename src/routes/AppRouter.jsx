@@ -18,6 +18,7 @@ import { Solicitantes } from "../pages/admin/solicitantes/Solicitantes";
 import { InfoSolicitante } from "../pages/admin/solicitantes/InfoSolicitante";
 import { UpdateSolicitante } from "../pages/admin/solicitantes/UpdateSolicitante";
 import { RecepcionConsulta } from "../pages/admin/consultas/RecepcionConsulta";
+import { Consultas } from "../pages/admin/consultas/Consultas";
 
 
 export const AppRouter = () => {
@@ -57,6 +58,7 @@ export const AppRouter = () => {
                         <Route path="/solicitantes/edit/:id" element={<UpdateSolicitante />} />
 
                         <Route path="/recepcion-consulta" element={<RecepcionConsulta />} />
+                        <Route path="/procesos/:tipo/:limite/:estado" element={<Consultas />} />
                     </Route>
 
                     {/* Ruta para manejar 404 (página no encontrada) y acceso no autorizado */}

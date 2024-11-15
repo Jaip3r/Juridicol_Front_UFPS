@@ -4,6 +4,8 @@ import LogoUFPS2 from "../../assets/logo-ufps-2.png"
 
 export const RegisterConsultaFormPDF = ({ formData }) => {
 
+    console.log(formData);
+
     // Definimos los estilos
     const styles = StyleSheet.create({
         body: {
@@ -108,6 +110,10 @@ export const RegisterConsultaFormPDF = ({ formData }) => {
             paddingTop: 5
         }
     });
+
+    if (!formData) {
+        return null;
+    } 
 
     return (
         <Document>
@@ -353,6 +359,9 @@ export const RegisterConsultaFormPDF = ({ formData }) => {
                     <Text style={styles.signature}>Firma del Estudiante</Text>
                     <Text style={styles.signature}>Firma del Usuario</Text>
                 </View>
+                <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vitae qui nobis perspiciatis! Quis quae voluptates iste numquam. Neque, harum tenetur. Officiis libero mollitia aliquid quae, commodi similique animi quibusdam eos omnis laborum maiores recusandae corporis obcaecati saepe natus fugit, suscipit dolorem. Laudantium reprehenderit voluptatem, ipsa quidem quisquam, eaque perspiciatis iusto accusantium facere distinctio enim minus incidunt? Impedit, totam. Aliquam, veniam, animi earum sint corporis distinctio magnam sunt necessitatibus nostrum ab enim pariatur repudiandae nisi quia libero at quis ipsa ut harum. Vero minima amet quaerat ratione tenetur, ut eius aspernatur provident at nihil molestias dolorum eligendi nisi dolor porro recusandae.
+                    
+                </div>
 
             </Page>
 
