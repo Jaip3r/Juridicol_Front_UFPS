@@ -248,6 +248,7 @@ export const Usuarios = () => {
               <Input
                 placeholder={`Ingrese el código del ${role}...`}
                 value={searchItem}
+                autoFocus
                 onChange={(e) => setSearchItem(e.target.value)}
               />
             </InputGroup>

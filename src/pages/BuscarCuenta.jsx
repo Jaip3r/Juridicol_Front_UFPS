@@ -61,7 +61,7 @@ export const RequestResetPasswordForm = () => {
                 />
                 <form onSubmit={onSubmit}>
                     <FormControl id="usuario" mb={6} isInvalid={errors.usuario}>
-                        <FormLabel htmlFor='usuario'>Ingresa tu usuario</FormLabel>
+                        <FormLabel htmlFor='usuario' fontSize="lg">Ingresa tu usuario</FormLabel>
                         <Input
                             type="text"
                             {...register('usuario')}
@@ -74,6 +74,7 @@ export const RequestResetPasswordForm = () => {
                         colorScheme="red"
                         width="100%"
                         borderRadius="full"
+                        fontSize="lg"
                     >
                         Buscar
                     </Button>

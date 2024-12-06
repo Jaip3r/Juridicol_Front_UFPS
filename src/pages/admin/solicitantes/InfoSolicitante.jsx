@@ -21,6 +21,7 @@ export const InfoSolicitante = () => {
     discapacidad: "",
     vulnerabilidad: "",
     direccion_actual: "",
+    tipo_solicitante: "",
     email: "",
     numero_contacto: "",
     nivel_estudio: "",
@@ -67,6 +68,7 @@ export const InfoSolicitante = () => {
                 vulnerabilidad: data?.vulnerabilidad,
                 ciudad: data?.ciudad,
                 direccion_actual: data?.direccion_actual,
+                tipo_solicitante: data?.tipo_solicitante || 'mondongo',
                 email: data?.email,
                 numero_contacto: data?.numero_contacto,
                 nivel_estudio: data?.nivel_estudio,
@@ -128,12 +130,12 @@ export const InfoSolicitante = () => {
         >
 
           {/* Título del formulario */}
-          <Text fontSize="2xl" fontWeight="bold" mb={6}>
+          <Text fontSize="2xl" fontWeight="bold" mb={6} textAlign="center">
             Información del Solicitante
           </Text>
 
-          {/* Formulario de perfil */}
-          <Stack spacing={4} w="full" maxW={{ base: "full", md: "600px" }}>
+          {/* Formulario de información de solicitante */}
+          <Stack spacing={4} w="full" maxW={{ base: "full", md: "700px" }}>
 
             {/* Título de la sección: Datos Básicos del Solicitante */}
             <Text fontWeight="bold" fontSize="lg" mb={2} mt={6}>
@@ -291,19 +293,31 @@ export const InfoSolicitante = () => {
               </FormControl>
             </Stack>
 
-            {/* Email */}
-            <FormControl id="email">
-              <FormLabel>Email</FormLabel>
-              <Input
-                type="email"
-                placeholder="Email"
-                value={solicitanteData.email}
-                isReadOnly
-                borderWidth="2px"
-              />
-            </FormControl>
+            {/* Tipo solicitante y Email */}
+            <Stack spacing={4} direction={{ base: "column", md: "row" }}>
+              <FormControl id="tipo_solicitante">
+                <FormLabel>Tipo de solicitante</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="Tipo de solicitante"
+                  value={solicitanteData.tipo_solicitante}
+                  isReadOnly
+                  borderWidth="2px"
+                />
+              </FormControl>
 
-            
+              {/* Email */}
+              <FormControl id="email">
+                <FormLabel>Email</FormLabel>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={solicitanteData.email}
+                  isReadOnly
+                  borderWidth="2px"
+                />
+              </FormControl>
+            </Stack>
 
             {/* Título de la sección: Caracterización Socioeconómica */}
             <Text fontWeight="bold" fontSize="lg" mb={2} mt={6}>

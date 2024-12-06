@@ -40,7 +40,7 @@ export const Solicitantes = () => {
 
   // Estados para el manejo de los filtros y recarga de datos
   const [filters, setFilters] = useState({
-    tipo_identificacion: "",
+    tipo_solicitante: "",
     discapacidad: "",
     vulnerabilidad: "",
     nivel_estudio: "",
@@ -58,26 +58,18 @@ export const Solicitantes = () => {
   // Definimos los filtros a establecer
   const filterDefinitions = [
     {
-      key: "tipo_identificacion",
-      placeholder: "Tipo de identificación",
+      key: "tipo_solicitante",
+      placeholder: "Tipo de Solicitante",
       options: [
-        { value: "Cédula de ciudadanía", label: "Cédula de ciudadanía" },
-        { value: "Cédula de extranjería", label: "Cédula de extranjería" },
+        { value: "Estudiante UFPS", label: "Estudiante UFPS" },
+        { value: "Docente UFPS", label: "Docente UFPS" },
         {
-          value: "Registro civil de nacimiento",
-          label: "Registro civil de nacimiento",
+          value: "Administrativo UFPS",
+          label: "Administrativo UFPS",
         },
         {
-          value: "Permiso especial de permanencia",
-          label: "Permiso especial de permanencia",
-        },
-        {
-          value: "VISA",
-          label: "VISA",
-        },
-        {
-          value: "Libreta militar",
-          label: "Libreta militar",
+          value: "Externo",
+          label: "Externo",
         },
       ],
     },
@@ -86,13 +78,12 @@ export const Solicitantes = () => {
       placeholder: "Discapacidad",
       options: [
         { value: "Ninguna", label: "Ninguna" },
-        { value: "Física", label: "Física" },
-        { value: "Intelectual", label: "Intelectual" },
-        { value: "Mental", label: "Mental" },
-        { value: "Psicosocial", label: "Psicosocial" },
-        { value: "Múltiple", label: "Múltiple" },
-        { value: "Sensorial", label: "Sensorial" },
-        { value: "Auditiva", label: "Auditiva" },
+        { value: "Discapacidad física", label: "Discapacidad física" },
+        { value: "Discapacidad intelectual-cognitiva", label: "Discapacidad intelectual-cognitiva" },
+        { value: "Discapacidad mental-psicosocial", label: "Discapacidad mental-psicosocial" },
+        { value: "Discapacidad múltiple", label: "Discapacidad múltiple" },
+        { value: "Discapacidad sensorial-visual", label: "Discapacidad sensorial-visual" },
+        { value: "Discapacidad sensorial-auditiva", label: "Discapacidad sensorial-auditiva" },
       ],
     },
     {
@@ -241,8 +232,9 @@ export const Solicitantes = () => {
               </InputLeftElement>
 
               <Input
-                placeholder="Ingrese los nombres o apellidos del solicitante..."
+                placeholder="Ingrese los nombres y apellidos del solicitante..."
                 value={searchItem}
+                autoFocus
                 onChange={(e) => setSearchItem(e.target.value)}
               />
             </InputGroup>

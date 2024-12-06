@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Flex, Input, InputGroup, InputLeftElement, Spinner, Stack, Text, useBreakpointValue } from "@chakra-ui/react";
 import { PageLayout } from "../../../components/container/PageLayout";
 import { FiSearch } from "react-icons/fi";
@@ -9,15 +9,45 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ConsultasTable } from "../../../components/tables/ConsultasTable";
 import { Pagination } from "../../../components/utils/Pagination";
+import { useGenerateReport } from "../../../hooks/useGenerateReport";
 
 
 export const Consultas = () => {
 
+    // Estado para el manejo de la búsqueda
+    const [searchItem, setSearchItem] = useState('');
+
+    // Debounce para el término de búsqueda
+    const [debounceSearchItem, setDebounceSearchItem] = useState(searchItem);
+
+    useEffect(() => {
+
+        const handler = setTimeout(() => {
+
+            // Validamos que el valor ingresadO tenga la estructura del radicado
+            if (/^CJ[A-Za-z]{1,2}/.test(searchItem)) {
+                setDebounceSearchItem(searchItem);
+            } else {
+                setDebounceSearchItem('');
+            }
+
+        }, 500);
+
+        return () => {
+        clearTimeout(handler);
+        }
+
+    }, [searchItem]);
+
     // Estados para el manejo de los filtros y recarga de datos
-    const [filters, setFilters] = useState({
+    const [filters_sub_1, setFilters_sub_1] = useState({
         area_derecho: "",
+        tipo_solicitante: "",
         discapacidad: "",
-        vulnerabilidad: "",
+        vulnerabilidad: ""
+    });
+
+    const [filters_sub_2, setFilters_sub_2] = useState({
         nivel_estudio: "",
         estrato: "",
         sisben: "",
@@ -26,33 +56,44 @@ export const Consultas = () => {
 
     // Memoizamos customParams para evitar cambios innecesarios
     const customParams = useMemo(() => ({
-        ...filters
-    }), [filters]);
+        ...filters_sub_1,
+        ...filters_sub_2,
+        searchItem: debounceSearchItem
+    }), [filters_sub_1, filters_sub_2, debounceSearchItem]);
 
     // Definimos los filtros a establecer
     const filterDefinitions = [
         {
-        key: "area_derecho",
-        placeholder: "Área de Derecho",
-        options: [
-            { value: "laboral", label: "Laboral" },
-            { value: "publico", label: "Público" },
-            { value: "civil", label: "Civil" },
-            { value: "penal", label: "Penal" },
-        ],
+            key: "area_derecho",
+            placeholder: "Área de Derecho",
+            options: [
+                { value: "laboral", label: "Laboral" },
+                { value: "publico", label: "Público" },
+                { value: "civil", label: "Civil" },
+                { value: "penal", label: "Penal" },
+            ],
+        },
+        {
+            key: "tipo_solicitante",
+            placeholder: "Tipo de Solicitante",
+            options: [
+                { value: "Estudiante UFPS", label: "Estudiante UFPS" },
+                { value: "Docente UFPS", label: "Docente UFPS" },
+                { value: "Administrativo UFPS", label: "Administrativo UFPS" },
+                { value: "Externo", label: "Externo" },
+            ],
         },
         {
             key: "discapacidad",
             placeholder: "Discapacidad",
             options: [
               { value: "Ninguna", label: "Ninguna" },
-              { value: "Física", label: "Física" },
-              { value: "Intelectual", label: "Intelectual" },
-              { value: "Mental", label: "Mental" },
-              { value: "Psicosocial", label: "Psicosocial" },
-              { value: "Múltiple", label: "Múltiple" },
-              { value: "Sensorial", label: "Sensorial" },
-              { value: "Auditiva", label: "Auditiva" },
+              { value: "Discapacidad física", label: "Discapacidad física" },
+              { value: "Discapacidad intelectual-cognitiva", label: "Discapacidad intelectual-cognitiva" },
+              { value: "Discapacidad mental-psicosocial", label: "Discapacidad mental-psicosocial" },
+              { value: "Discapacidad múltiple", label: "Discapacidad múltiple" },
+              { value: "Discapacidad sensorial-visual", label: "Discapacidad sensorial-visual" },
+              { value: "Discapacidad sensorial-auditiva", label: "Discapacidad sensorial-auditiva" },
             ],
         },
         {
@@ -100,7 +141,7 @@ export const Consultas = () => {
               { value: "Estrato 6", label: "Estrato 6" },
             ],
         },
-          {
+        {
             key: "sisben",
             placeholder: "Sisben",
             options: [
@@ -112,12 +153,12 @@ export const Consultas = () => {
             ],
         },
         {
-        key: "order",
-        placeholder: "Orden",
-        options: [
-            { value: "asc", label: "Ascendente" },
-            { value: "desc", label: "Descendente" }
-        ]
+            key: "order",
+            placeholder: "Orden",
+            options: [
+                { value: "asc", label: "Ascendente" },
+                { value: "desc", label: "Descendente" }
+            ]
         }
     ];
 
@@ -152,7 +193,7 @@ export const Consultas = () => {
         }
     };
 
-    // Obtenemos la info de los usuarios
+    // Obtenemos la info de las consultas
     const {
         data: consultas,
         pagination,
@@ -175,6 +216,17 @@ export const Consultas = () => {
         fetchData(direction, {});
     };
 
+    // Hook para gestionar la generación del reporte
+    // Uso del hook personalizado
+    const { generateReport, isLoading: reportLoading } = useGenerateReport({
+        endpoint: '/consultas/report',
+        params: { tipo_consulta, ...filters_sub_1, ...filters_sub_2, limite },
+        fileName: 'Reporte_Consultas.xlsx',
+        onError: (error) => {
+          handleError(error, 'Error al generar el reporte');
+        },
+    });
+
     // Determinar si estamos en una pantalla móvil
     const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -184,18 +236,18 @@ export const Consultas = () => {
 
             { loading ? (
 
-            <Flex justify="center" align="center" h="100vh" flexDirection="column">
-            <Spinner
-                size="xl"
-                thickness="4px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="red.500"
-            />
-            <Text mt={4} fontSize={{ base: "md", md: "lg" }} color="gray.600">
-                Obteniendo información de las consultas...
-            </Text>
-            </Flex>
+                <Flex justify="center" align="center" h="100vh" flexDirection="column">
+                <Spinner
+                    size="xl"
+                    thickness="4px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color="red.500"
+                />
+                <Text mt={4} fontSize={{ base: "md", md: "lg" }} color="gray.600">
+                    {`Obteniendo información de las ${tipo_consulta === 'consulta' ? 'consultas' : 'asesorias'}...`}
+                </Text>
+                </Flex>
 
             ) : (
 
@@ -205,6 +257,9 @@ export const Consultas = () => {
                     <Button
                         colorScheme="green"
                         size="sm"
+                        onClick={generateReport}
+                        isLoading={reportLoading}
+                        loadingText="Generando..."
                         mb={4}
                     >
                         Generar Reporte
@@ -218,7 +273,10 @@ export const Consultas = () => {
                         </InputLeftElement>
 
                         <Input
-                            placeholder={`Ingrese el radicado de la consulta...`}
+                            placeholder={`Ingrese el radicado de la ${tipo_consulta === 'consulta' ? 'consulta' : 'asesoria'}`}
+                            value={searchItem}
+                            autoFocus
+                            onChange={(e) => setSearchItem(e.target.value)}
                         />
                         </InputGroup>
                     </Stack>
@@ -226,9 +284,16 @@ export const Consultas = () => {
                     { /*Campos de filtrado*/ }
                     <Filters
                         isMobile={isMobile}
-                        filters={filters}
-                        setFilters={setFilters}
-                        filtersDefinitions={filterDefinitions}
+                        filters={filters_sub_1}
+                        setFilters={setFilters_sub_1}
+                        filtersDefinitions={filterDefinitions.slice(0, 4)}
+                    />
+
+                    <Filters
+                        isMobile={isMobile}
+                        filters={filters_sub_2}
+                        setFilters={setFilters_sub_2}
+                        filtersDefinitions={filterDefinitions.slice(4)}
                     />
 
                     <Flex
