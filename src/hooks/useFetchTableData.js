@@ -4,12 +4,16 @@ import { filterParams } from '../utils/filterParams';
 
 export const useFetchTableData = ({
     endpoint,
+    countEndpoint = "",
     initialParams = {},
     initialData = [],
     dependencies = [],
     customParams = {},
     onError = () => {}
 }) => {
+
+    console.log(endpoint);
+    console.log(countEndpoint);
 
     // Estado para almacenar la info de la API 
     const [data, setData] = useState(initialData);
@@ -133,7 +137,8 @@ export const useFetchTableData = ({
                 const filteredParams = filterParams(params);
 
                 // Realizamos la solicitud
-                const response = await axiosPrivate.get(`${endpoint}/count`, { params: filteredParams });
+                const source = countEndpoint !== "" ? countEndpoint : `${endpoint}/count`;
+                const response = await axiosPrivate.get(source, { params: filteredParams });
                 const data = response?.data;
 
                 // setear el valor de totalRecords
