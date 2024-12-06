@@ -1,5 +1,5 @@
-import { IconButton, Stack, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
-import { FiEdit, FiInfo } from "react-icons/fi";
+import { IconButton, Stack, Table, Tbody, Td, Th, Thead, Tooltip, Tr } from "@chakra-ui/react";
+import { FiEdit, FiInbox, FiInfo } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
 
@@ -17,6 +17,7 @@ export const SolicitantesTable = ({
           <Th>Apellidos</Th>
           <Th>Tipo de identificación</Th>
           <Th>Número de identificación</Th>
+          <Th>Tipo de solicitante</Th>
           <Th>Número de contacto</Th>
           <Th>Email</Th>
           <Th>Discapacidad</Th>
@@ -40,6 +41,7 @@ export const SolicitantesTable = ({
             <Td>{solicitante.apellidos}</Td>
             <Td>{solicitante.tipo_identificacion}</Td>
             <Td>{solicitante.numero_identificacion}</Td>
+            <Td>{solicitante.tipo_solicitante}</Td>
             <Td>{solicitante.numero_contacto}</Td>
             <Td>{solicitante.email || "Correo no proporcionado"}</Td>
             <Td>{solicitante.discapacidad}</Td>
@@ -51,21 +53,36 @@ export const SolicitantesTable = ({
             <Td>{solicitante.fecha_actualizacion}</Td>
             <Td>
               <Stack direction="row" spacing={2}>
+                <Tooltip hasArrow label="Más información">
+                  <IconButton
+                    as={Link}
+                    to={`/solicitantes/info/${solicitante.id}`}
+                    aria-label="Información"
+                    icon={<FiInfo />}
+                    colorScheme="green"
+                  />
+                </Tooltip>
+                <Tooltip hasArrow label="Actualizar info solicitante">
+                  <IconButton
+                    as={Link}
+                    to={`/solicitantes/edit/${solicitante.id}`}
+                    aria-label="Editar"
+                    icon={<FiEdit />}
+                    colorScheme="blue"
+                  />
+                </Tooltip>
+              </Stack>
+            </Td>
+            <Td>
+              <Tooltip hasArrow label="Ver consultas asociadas">
                 <IconButton
                   as={Link}
-                  to={`/solicitantes/info/${solicitante.id}`}
-                  aria-label="Información"
-                  icon={<FiInfo />}
+                  to={`/solicitantes/consultas/${solicitante.id}`}
+                  aria-label="Consultas solicitantes"
+                  icon={<FiInbox />}
                   colorScheme="green"
                 />
-                <IconButton
-                  as={Link}
-                  to={`/solicitantes/edit/${solicitante.id}`}
-                  aria-label="Editar"
-                  icon={<FiEdit />}
-                  colorScheme="blue"
-                />
-              </Stack>
+              </Tooltip>
             </Td>
           </Tr>
         ))}

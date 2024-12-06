@@ -1,4 +1,4 @@
-import { IconButton, Stack, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { IconButton, Stack, Table, Tbody, Td, Th, Thead, Tooltip, Tr } from "@chakra-ui/react";
 import { FiCheckCircle, FiEdit, FiXCircle } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
@@ -38,19 +38,23 @@ export const UsersTable = ({
                         <Td>{usuario.fecha_registro}</Td>
                         <Td>
                             <Stack direction="row" spacing={2}>
-                                <IconButton
-                                    as={Link}
-                                    to={`/users/edit/${usuario.id}`}
-                                    aria-label="Editar"
-                                    icon={<FiEdit />}
-                                    colorScheme="blue"
-                                />
-                                <IconButton
-                                    aria-label={usuario.activo ? 'Inhabilitar' : 'Habilitar'}
-                                    icon={usuario.activo ? <FiXCircle /> : <FiCheckCircle />}
-                                    colorScheme={usuario.activo ? 'red' : 'green'}
-                                    onClick={() => onToggleActive(usuario)}
-                                />
+                                <Tooltip hasArrow label="Actualizar usuario">
+                                    <IconButton
+                                        as={Link}
+                                        to={`/users/edit/${usuario.id}`}
+                                        aria-label="Editar"
+                                        icon={<FiEdit />}
+                                        colorScheme="blue"
+                                    />
+                                </Tooltip>
+                                <Tooltip hasArrow label={usuario.activo ? 'Inhabilitar usuario' : 'Habilitar usuario'} aria-label="Tooltip">
+                                    <IconButton
+                                        aria-label={usuario.activo ? 'Inhabilitar' : 'Habilitar'}
+                                        icon={usuario.activo ? <FiXCircle /> : <FiCheckCircle />}
+                                        colorScheme={usuario.activo ? 'red' : 'green'}
+                                        onClick={() => onToggleActive(usuario)}
+                                    />
+                                </Tooltip>
                             </Stack>
                         </Td>
                     </Tr>

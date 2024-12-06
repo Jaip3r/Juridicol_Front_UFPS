@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSessionExpired } from "../../hooks/useSessionExpired";
 import { useAxiosPrivate } from "../../hooks/useAxiosPrivate";
-import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input, Select, Spinner, Stack, Text } from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormErrorMessage, FormLabel, IconButton, Input, Select, Spinner, Stack, Text } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from 'yup';
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { MdArrowBack } from "react-icons/md";
 
 
 export const EditSolicitanteForm = () => {
@@ -60,6 +61,8 @@ export const EditSolicitanteForm = () => {
       .required("La ciudad de residencia es requerida")
       .min(5, "La ciudad de residencia debe contener entre 5 y 45 carácteres")
       .max(45, "La ciudad de residencia debe contener entre 5 y 45 carácteres"),
+    tipo_solicitante: yup.string()
+      .required("El tipo de solicitante es requerido"),
     direccion_actual: yup.string()
       .required("La dirección actual es requerida")
       .min(5, "La dirección actual debe contener minimo 5 carácteres")
@@ -144,8 +147,6 @@ export const EditSolicitanteForm = () => {
 
     data.fecha_nacimiento = format(new Date(data.fecha_nacimiento), "yyyy-MM-dd");
 
-    console.log(data);
-
     try {
 
       const response = await toast.promise(
@@ -211,16 +212,40 @@ export const EditSolicitanteForm = () => {
           borderRadius="md"
           boxShadow="md"
           w="full"
+          position="relative"
         >
 
+          {/* Botón de flecha en el extremo superior izquierdo */}
+          <IconButton
+            as={Link}
+            to={"/solicitantes"}
+            icon={<MdArrowBack />}
+            aria-label="Volver"
+            colorScheme='red'
+            variant="ghost"
+            position="absolute"
+            top="4"
+            left="4"
+            size="lg"
+            _hover={{ bg: 'transparent' }} // Elimina el fondo en hover
+            _active={{ bg: 'transparent' }} // Elimina el fondo en estado activo
+            _focus={{ boxShadow: 'none' }} // Elimina el borde de enfoque 
+          />
+
           {/* Titulo del formulario */}
-          <Text fontSize="2xl" fontWeight="bold" mb={6}>
-            Actualización datos de solicitante
+          <Text
+            fontSize="2xl"
+            fontWeight="bold"
+            textAlign="center"
+            mt={5}
+            mb={6}
+          >
+            Actualización datos del solicitante
           </Text>
 
           {/* Formulario de actualización de datos */}
           <form onSubmit={onSubmit}>
-            <Stack spacing={4} w="full" maxW={{ base: "full", md: "600px" }}>
+            <Stack spacing={4} w="full" maxW={{ base: "full", md: "700px" }}>
 
               {/* Título de la sección: Datos Básicos del Solicitante */}
               <Text fontWeight="bold" fontSize="lg" mb={2} mt={6}>
@@ -354,13 +379,12 @@ export const EditSolicitanteForm = () => {
                     {...register("discapacidad")}
                   >
                     <option value="Ninguna">Ninguna</option>
-                    <option value="Física">Física</option>
-                    <option value="Intelectual">Intelectual</option>
-                    <option value="Mental">Mental</option>
-                    <option value="Psicosocial">Psicosocial</option>
-                    <option value="Múltiple">Múltiple</option>
-                    <option value="Sensorial">Sensorial</option>
-                    <option value="Auditiva">Auditiva</option>
+                    <option value="Discapacidad física">Discapacidad física</option>
+                    <option value="Discapacidad intelectual-cognitiva">Discapacidad intelectual-cognitiva</option>
+                    <option value="Discapacidad mental-psicosocial">Discapacidad mental-psicosocial</option>
+                    <option value="Discapacidad múltiple">Discapacidad múltiple</option>
+                    <option value="Discapacidad sensorial-visual">Discapacidad sensorial-visual</option>
+                    <option value="Discapacidad sensorial-auditiva">Discapacidad sensorial-auditiva</option>
                   </Select>
                   <FormErrorMessage>{errors.discapacidad?.message}</FormErrorMessage>
                 </FormControl>
@@ -430,19 +454,36 @@ export const EditSolicitanteForm = () => {
 
               </Stack>
 
-              {/* Dirección actual */}
-              <FormControl id="direccion_actual" isRequired isInvalid={errors.direccion_actual}>
-                  <FormLabel htmlFor="direccion_actual">Dirección actual</FormLabel>
-                  <Input
-                    type="text"
-                    id="direccion_actual"
-                    placeholder="Dirección actual"
-                    borderWidth="2px"
-                    autoComplete="off"
-                    {...register("direccion_actual")}
-                  />
-                  <FormErrorMessage>{errors.direccion_actual?.message}</FormErrorMessage>
-              </FormControl>
+              {/* Tipo de solicitante y Dirección actual */}
+              <Stack spacing={4} direction={{ base: "column", md: "row" }}>
+                <FormControl id="tipo_solicitante" isRequired isInvalid={errors.tipo_solicitante}>
+                    <FormLabel htmlFor="tipo_solicitante">Tipo de solicitante</FormLabel>
+                    <Select
+                      placeholder="Seleccione el tipo de solicitante"
+                      id="tipo_solicitante"
+                      {...register("tipo_solicitante")}
+                    >
+                      <option value="Estudiante UFPS">Estudiante UFPS</option>
+                      <option value="Docente UFPS">Docente UFPS</option>
+                      <option value="Administrativo UFPS">Administrativo UFPS</option>
+                      <option value="Externo">Externo</option>
+                    </Select>
+                    <FormErrorMessage>{errors.tipo_solicitante?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl id="direccion_actual" isRequired isInvalid={errors.direccion_actual}>
+                    <FormLabel htmlFor="direccion_actual">Dirección actual</FormLabel>
+                    <Input
+                      type="text"
+                      id="direccion_actual"
+                      placeholder="Dirección actual"
+                      borderWidth="2px"
+                      autoComplete="off"
+                      {...register("direccion_actual")}
+                    />
+                    <FormErrorMessage>{errors.direccion_actual?.message}</FormErrorMessage>
+                </FormControl>
+              </Stack>
 
               {/* Título de la sección: Caracterización Socioeconómica */}
               <Text fontWeight="bold" fontSize="lg" mb={2} mt={6}>

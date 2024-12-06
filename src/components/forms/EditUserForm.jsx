@@ -4,15 +4,19 @@ import * as yup from 'yup';
 import { useSessionExpired } from '../../hooks/useSessionExpired';
 import { useAxiosPrivate } from '../../hooks/useAxiosPrivate';
 import { useEffect, useState } from 'react';
-import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input, Select, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Button, Flex, FormControl, FormErrorMessage, FormLabel, IconButton, Input, Select, Spinner, Stack, Text } from '@chakra-ui/react';
 import { toast } from 'react-hot-toast';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { MdArrowBack } from 'react-icons/md';
 
 
 export const EditUserForm = () => {
 
     // Obtener el 'id' desde los parámetros de la ruta
     const { id } = useParams();
+
+    // Estado para almacear el rol del usuario
+    const [userRole, setUserRole] = useState('');
 
     // Esquema de validación
     const updateUserSchema = yup.object().shape({
@@ -83,6 +87,9 @@ export const EditUserForm = () => {
                         setValue(key, userData[key]);
                     }
                 }
+
+                // Guardamos el rol del usuario en el estado
+                setUserRole(userData?.rol);
                 
             } catch (error) {
                 if (!error?.response) toast.error("Sin respuesta del servidor");
@@ -159,11 +166,47 @@ export const EditUserForm = () => {
 
             ) : (
 
-                    <Flex direction="column" align="center" bg="white" p={10} borderRadius="md" boxShadow="md" w="full">
+                    <Flex 
+                        direction="column" 
+                        align="center" 
+                        bg="white" 
+                        p={10} 
+                        borderRadius="md" 
+                        boxShadow="md" 
+                        w="full"
+                        position="relative"
+                    >
+
+                        {/* Botón de flecha en el extremo superior izquierdo */}
+                        <IconButton
+                            as={Link}
+                            to={
+                                userRole === 'estudiante'
+                                    ? '/users/practicantes'
+                                    : '/users/profesores'
+                            }
+                            icon={<MdArrowBack />}
+                            aria-label="Volver"
+                            colorScheme='red'
+                            variant="ghost"
+                            position="absolute"
+                            top="4" 
+                            left="4"
+                            size="lg"
+                            _hover={{ bg: 'transparent' }} // Elimina el fondo en hover
+                            _active={{ bg: 'transparent' }} // Elimina el fondo en estado activo
+                            _focus={{ boxShadow: 'none' }} // Elimina el borde de enfoque 
+                        />
 
                         {/* Titulo del formulario */}
-                        <Text fontSize="2xl" fontWeight="bold" mb={6}>
-                            Actualización datos de usuario
+                        <Text
+                            fontSize="2xl"
+                            fontWeight="bold"
+                            textAlign="center"
+                            mt={5}
+                            mb={6}
+                        >
+                            Actualización datos del usuario
                         </Text>
 
                         {/* Formulario de actualización de datos */}

@@ -121,7 +121,7 @@ export const RegisterForm = () => {
 
             {/* Formulario de registro */}
             <form onSubmit={onSubmit}>
-                <Stack spacing={4} w="full" maxW={{ base: "full", md: "600px" }}>
+                <Stack spacing={4} w="full" maxW={{ base: "full", md: "700px" }}>
 
                     {/* Nombres y Apellidos */}
                     <Stack spacing={4} direction={{ base: "column", md: "row" }}>
@@ -227,7 +227,7 @@ export const RegisterForm = () => {
                     </Stack>
 
                     <Stack justify="center" direction={{ base: "column", sm: "row" }} spacing={4} mt={6}>
-                        <Button colorScheme="red" type="submit">Registrar usuario</Button>
+                        <Button colorScheme="red" type="submit">Registrar</Button>
                     </Stack>
                 </Stack>
             </form>

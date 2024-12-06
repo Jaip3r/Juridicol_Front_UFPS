@@ -1,4 +1,4 @@
-import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Image, Input, Select, Stack, Text, Textarea } from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, Image, Input, Select, Stack, Text, Textarea } from "@chakra-ui/react";
 import LogoConsultorio from "../../assets/LogoConsultorio.jpeg";
 import LogoUFPS2 from "../../assets/logo-ufps-2.png";
 import { useForm } from "react-hook-form";
@@ -7,7 +7,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { BlobProvider } from "@react-pdf/renderer";
 import { RegisterConsultaFormPDF } from "../utils/RegisterConsultaFormPDF";
 import { useState } from "react";
+import { useSessionExpired } from "../../hooks/useSessionExpired";
+import { useAxiosPrivate } from "../../hooks/useAxiosPrivate";
 import toast from "react-hot-toast";
+import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { FiCopy } from "react-icons/fi";
 
 
 // Esquema de validación
@@ -26,9 +31,8 @@ const registerConsultaSchema = yup.object().shape({
         .required("El tipo de identificación es requerido"),
     numero_identificacion: yup.string()
         .required("El número de identificación es requerido")
-        .matches(/^\d+$/, "El número de identificación debe contener solo números")
-        .min(8, "El número de identificación debe contener entre 8 a 15 digitos")
-        .max(15, "El número de identificación debe contener entre 8 a 15 digitos"),
+        .min(6, "El número de identificación debe contener entre 6 a 15 carácteres/digitos")
+        .max(15, "El número de identificación debe contener entre 6 a 15 carácteres/digitos"),
     fecha_nacimiento: yup.date()
         .required("La fecha de nacimiento es requerida")
         .transform((curr, originalValue) => originalValue === "" ? undefined : curr)  // Transformamos cadenas vacías en indefinido
@@ -47,6 +51,8 @@ const registerConsultaSchema = yup.object().shape({
         .required("El valor de discapacidad es requerido"),
     vulnerabilidad: yup.string()
         .required("El valor de vulnerabilidad es requerido"),
+    tipo_solicitante: yup.string()
+        .required("El tipo de solicitante es requerido"),
     email: yup.string()
         .optional()
         .email("El email debe corresponder con una dirección de correo válida")
@@ -122,19 +128,19 @@ const registerConsultaSchema = yup.object().shape({
     hechos: yup.string()
         .required("Los hechos relevantes de la consulta son requeridos")
         .min(5, "Mínimo 5 carácteres")
-        .max(1200, "Máximo 1200 carácteres"),
+        .max(800, "Máximo 800 carácteres"),
     pretensiones: yup.string()
         .required("Las pretensiones de la consulta son requeridos")
         .min(5, "Mínimo 5 carácteres")
-        .max(1200, "Máximo 1200 carácteres"),
+        .max(800, "Máximo 800 carácteres"),
     observaciones: yup.string()
         .required("Las observaciones de la consulta son requeridos")
         .min(5, "Mínimo 5 carácteres")
-        .max(1200, "Máximo 1200 carácteres"),
+        .max(800, "Máximo 800 carácteres"),
     anexos: yup.mixed()
         .optional()
         .test('fileCount', 'No se pueden subir más de 8 archivos', value => {
-            return value.length <= 8
+            return value.length <= 6
         })
         .test('fileType', 'Solo se admiten archivos PDF', value => {
             if (!value) return false;
@@ -150,8 +156,13 @@ const registerConsultaSchema = yup.object().shape({
 
 export const RegisterConsultaForm = () => {
 
+    // Estados para el manejo de la lógica de reintento
+    const [consultaId, setConsultaId] = useState(null);
+    const [anexos, setAnexos] = useState([]);
+    const [showRetryButton, setShowRetryButton] = useState(false);
+
     // Estado para almacenar los valores actuales del formulario
-    const [formData, setFormData] = useState({});
+    const [bodyForm, setBodyForm] = useState({});
 
     // Estado booleano para determinar si se debe mostrar el enlace para descargar el pdf
     const [showDownloadLink, setShowDownloadLink] = useState(false);
@@ -161,14 +172,221 @@ export const RegisterConsultaForm = () => {
         register,
         handleSubmit,
         getValues,
+        setValue,
         trigger,
+        reset,
         formState: { errors }
     } = useForm({ resolver: yupResolver(registerConsultaSchema), mode: "onChange", criteriaMode: "all" });
 
+    // Hook que permite la navegación programática
+    const navigate = useNavigate();
+
+    // Estado para el manejo del estado de la sesión
+    const { setIsSessionExpired } = useSessionExpired();
+
+    const axiosPrivate = useAxiosPrivate(); // Instancia de axios con autenticación.
+
     // Función de envío del formulario
     const onSubmit = handleSubmit(async (data) => {
-        console.log(data);
+
+        try {
+
+            const formData = new FormData();
+
+            // Añadir campos de texto al FormData
+            formData.append('nombre', data.nombre);
+            formData.append('apellidos', data.apellidos);
+            formData.append('genero', data.genero);
+            formData.append('tipo_identificacion', data.tipo_identificacion);
+            formData.append('numero_identificacion', data.numero_identificacion);
+            formData.append('tipo_solicitante', data.tipo_solicitante);
+            formData.append('fecha_nacimiento', format(new Date(data.fecha_nacimiento), "yyyy-MM-dd"));
+            formData.append('numero_contacto', data.numero_contacto);
+            formData.append('discapacidad', data.discapacidad);
+            formData.append('vulnerabilidad', data.vulnerabilidad);
+            formData.append('lugar_nacimiento', data.lugar_nacimiento);
+            formData.append('ciudad', data.ciudad);
+            formData.append('direccion_actual', data.direccion_actual);
+            formData.append('nivel_estudio', data.nivel_estudio);
+            formData.append('estrato', data.estrato);
+            formData.append('sisben', data.sisben);
+            formData.append('nivel_ingreso_economico', data.nivel_ingreso_economico);
+            formData.append('actividad_economica', data.actividad_economica);
+            formData.append('oficio', data.oficio);
+            formData.append('nombre_accionante', data.nombre_accionante);
+            formData.append('telefono_accionante', data.telefono_accionante);
+            formData.append('correo_accionante', data.correo_accionante);
+            formData.append('direccion_accionante', data.direccion_accionante);
+            formData.append('nombre_accionado', data.nombre_accionado);
+            formData.append('hechos', data.hechos);
+            formData.append('pretensiones', data.pretensiones);
+            formData.append('observaciones', data.observaciones);
+            formData.append('tipo_consulta', data.tipo_consulta);
+            formData.append('area_derecho', data.area_derecho);
+
+            // Añadir archivos al FormData
+            if (data.anexos && data.anexos.length > 0) {
+                for (let i = 0; i < data.anexos.length; i++) {
+                    formData.append('anexos', data.anexos[i]);
+                }
+                setAnexos(data.anexos);
+            }
+
+            // Añadir campos opcionales solo si tienen valor
+            if (data.email && data.email !== "") {
+                formData.append('email', data.email);
+            }
+            if (data.telefono_accionado && data.telefono_accionado !== "") {
+                formData.append('telefono_accionado', data.telefono_accionado);
+            }
+            if (data.correo_accionado && data.correo_accionado !== "") {
+                formData.append('correo_accionado', data.correo_accionado);
+            }
+            if (data.direccion_accionado && data.direccion_accionado !== "") {
+                formData.append('direccion_accionado', data.direccion_accionado);
+            }
+
+            const response = await toast.promise(
+
+                axiosPrivate.post('/consultas', formData),
+                {
+                    loading: 'Registrando consulta...',
+                    success: '¡Consulta registrada correctamente!',
+                    error: (error) => {
+                        if (!error?.response) { 
+                            return "Sin respuesta del servidor"; 
+                        }
+                        else if (
+                            error?.response?.status === 500 &&
+                            (error?.response?.data?.message.includes('Consulta registrada, pero ocurrió un error al subir los archivos')
+                            || error?.response?.data?.message.startsWith('Ocurrió un error al subir los archivos'))
+                        ) {
+                            return error?.response?.data?.message;
+                        }
+                        else if (
+                            error?.response?.status === 403 && 
+                            error?.response?.data?.message === "Token de refresco inválido o revocado"
+                        ) {
+                            return "Sesión Finalizada";
+                        } else {
+                            return error?.response?.data?.message || 'Error al registrar consulta';
+                        }
+                    }
+                }
+
+            );
+             
+            reset();
+
+            if (response?.status === 201) {
+                navigate("/procesos/consulta/diaria/pendiente");
+            }
+
+        } catch (error) {
+            if (
+                error?.response?.status === 500 &&
+                (error?.response?.data?.message.includes('Consulta registrada, pero ocurrió un error al subir los archivos')
+                || error?.response?.data?.message.startsWith('Ocurrió un error al subir los archivos'))
+            ) {
+                const consultaId = error.response.data.consultaId;
+                setConsultaId(consultaId);
+                setShowRetryButton(true);
+            } else if (error?.response?.status === 403 && error?.response?.data?.message === "Token de refresco inválido o revocado") {
+                setIsSessionExpired(true);
+            } else {
+                toast.error(error?.response?.data?.message || 'Error al registrar consulta');
+            }
+        }
+
     });
+
+    // Función para manejar el reintento de subida de archivos
+    const handleRetryUpload = async () => {
+
+        try {
+
+            // Creamos el formData
+            const retryFormData = new FormData();
+
+            // Adjuntamos los anexos
+            if (anexos && anexos.length > 0) {
+                for (let i = 0; i < anexos.length; i++) {
+                  retryFormData.append('anexos', anexos[i]);
+                }
+            }
+
+            // Realizamos la petición de reitento
+            const response = await toast.promise(
+                axiosPrivate.post(`/consultas/retry/upload/${consultaId}`, retryFormData),
+                {
+                    loading: 'Reintentando subir archivos...',
+                    success: '!Archivos subidos correctamente!',
+                    error: (error) => {
+                        if (!error?.response) { 
+                            return "Sin respuesta del servidor"; 
+                        }
+                        else if (
+                            error?.response?.status === 500 &&
+                            (error?.response?.data?.message.includes('Consulta registrada, pero ocurrió un error al subir los archivos')
+                            || error?.response?.data?.message.startsWith('Ocurrió un error al subir los archivos'))
+                        ) {
+                            return "Ocurrió un error al subir los archivos. Por favor, reintente"
+                        }
+                        else if (
+                            error?.response?.status === 403 && 
+                            error?.response?.data?.message === "Token de refresco inválido o revocado"
+                        ) {
+                            return "Sesión Finalizada";
+                        } else {
+                            return error?.response?.data?.message || 'Error al registrar consulta';
+                        }
+                    }
+                }
+            );
+
+            // Limpiamos los estados relacionados y navegamos a la página correspondiente
+            if (response?.status === 200) {
+                setConsultaId(null);
+                setAnexos([]);
+                setShowRetryButton(false);
+                navigate('/procesos/consulta/diaria/pendiente');
+            }
+            
+        } catch (error) {
+            if (
+                error?.response?.status === 403 
+                && error?.response?.data?.message === "Token de refresco inválido o revocado"
+            ) {
+                setIsSessionExpired(true);
+            } 
+            else if (error?.response?.status === 404) {
+
+                // Consulta no encontrada, restablecemos los estados
+                setConsultaId(null);
+                setAnexos([]);
+                setShowRetryButton(false);
+
+                toast.error("La consulta ya no esta disponible para subir archivos");
+
+            }
+            else {
+                toast.error(error?.response?.data?.message || 'Error al reintentar subir archivos');
+            }
+        }
+
+    }
+
+    // Función para copiar datos del solicitante al accionante
+    const handleCopySolicitanteToAccionante = () => {
+        const values = getValues();
+        setValue("nombre_accionante", `${values.nombre} ${values.apellidos}`);
+        setValue("telefono_accionante", values.numero_contacto);
+        setValue("correo_accionante", values.email);
+        setValue("direccion_accionante", values.direccion_actual);
+        
+        // Opcional: Puedes mostrar una notificación para confirmar la acción
+        toast.success("Información del solicitante copiada al accionante.");
+    };
 
     // Función para manejar el click en el botón de generar PDF
     const handleGeneratePDFClick = async () => {
@@ -178,7 +396,7 @@ export const RegisterConsultaForm = () => {
             const values = getValues();
             // Excluir el campo 'anexos' del formData
             const { anexos, ...valuesWithoutAnexos } = values;
-            setFormData(valuesWithoutAnexos); // Actualizamos el formData
+            setBodyForm(valuesWithoutAnexos); // Actualizamos el formData
             setShowDownloadLink(true); // Mostramos el enlace de descarga
 
         } else {
@@ -308,7 +526,7 @@ export const RegisterConsultaForm = () => {
                                 <option value="Registro civil de nacimiento">Registro civil de nacimiento</option>
                                 <option value="Permiso especial de permanencia">Permiso especial de permanencia</option>
                                 <option value="VISA">VISA</option>
-                                <option value="Libreta Militar">Libreta militar</option>
+                                <option value="Libreta militar">Libreta militar</option>
                             </Select>
                             <FormErrorMessage>{errors.tipo_identificacion?.message}</FormErrorMessage>
                         </FormControl>
@@ -365,17 +583,15 @@ export const RegisterConsultaForm = () => {
                                 {...register("discapacidad")}
                             >
                                 <option value="Ninguna">Ninguna</option>
-                                <option value="Física">Física</option>
-                                <option value="Intelectual">Intelectual</option>
-                                <option value="Mental">Mental</option>
-                                <option value="Psicosocial">Psicosocial</option>
-                                <option value="Múltiple">Múltiple</option>
-                                <option value="Sensorial">Sensorial</option>
-                                <option value="Auditiva">Auditiva</option>
+                                <option value="Discapacidad física">Discapacidad física</option>
+                                <option value="Discapacidad intelectual-cognitiva">Discapacidad intelectual-cognitiva</option>
+                                <option value="Discapacidad mental-psicosocial">Discapacidad mental-psicosocial</option>
+                                <option value="Discapacidad múltiple">Discapacidad múltiple</option>
+                                <option value="Discapacidad sensorial-visual">Discapacidad sensorial-visual</option>
+                                <option value="Discapacidad sensorial-auditiva">Discapacidad sensorial-auditiva</option>
                             </Select>
                             <FormErrorMessage>{errors.discapacidad?.message}</FormErrorMessage>
                         </FormControl>
-
 
                         <FormControl id="vulnerabilidad" isRequired isInvalid={errors.vulnerabilidad}>
                             <FormLabel fontSize={{ md: "sm", lg: "md" }} htmlFor="vulnerabilidad">Vulnerabilidad</FormLabel>
@@ -398,8 +614,23 @@ export const RegisterConsultaForm = () => {
 
                     </Stack>
 
-                    {/* Email y Lugar de nacimiento */}
+                    {/* Tipo de solicitante, Email y Lugar de nacimiento */}
                     <Stack spacing={4} direction={{ base: "column", md: "row" }}>
+
+                        <FormControl id="tipo_solicitante" isRequired isInvalid={errors.tipo_solicitante}>
+                            <FormLabel fontSize={{ md: "sm", lg: "md" }} htmlFor="tipo_solicitante">Tipo de solicitante</FormLabel>
+                            <Select
+                                placeholder="Seleccione el tipo de solicitante"
+                                id="tipo_solicitante"
+                                {...register("tipo_solicitante")}
+                            >
+                                <option value="Estudiante UFPS">Estudiante UFPS</option>
+                                <option value="Docente UFPS">Docente UFPS</option>
+                                <option value="Administrativo UFPS">Administrativo UFPS</option>
+                                <option value="Externo">Externo</option>
+                            </Select>
+                            <FormErrorMessage>{errors.tipo_solicitante?.message}</FormErrorMessage>
+                        </FormControl>
 
                         <FormControl id="email" isInvalid={errors.email}>
                             <FormLabel fontSize={{ md: "sm", lg: "md" }} htmlFor="email">Email</FormLabel>
@@ -600,6 +831,23 @@ export const RegisterConsultaForm = () => {
                         Accionante
                     </Text>
 
+                    {/* Botón para copiar la información del solicitante */}
+                    <Button
+                        size="sm"
+                        colorScheme="red"
+                        variant="solid"
+                        leftIcon={<FiCopy />} 
+                        onClick={handleCopySolicitanteToAccionante}
+                        fontSize={{ base: "sm", md: "md", lg: "md" }} // Tamaño de fuente responsivo
+                        px={{ base: 4, md: 6, lg: 8 }} // Padding horizontal responsivo
+                        py={{ base: 2, md: 3, lg: 4 }} // Padding vertical responsivo
+                        whiteSpace="normal" // Permite que el texto envuelva si es necesario
+                        textAlign="center" // Alinea el texto al centro
+                        maxW="100%" 
+                    >
+                        Copiar información del solicitante
+                    </Button>
+
                     {/* Nombre y teléfono del accionante */}
                     <Stack spacing={4} direction={{ base: "column", md: "row" }}>
 
@@ -791,6 +1039,7 @@ export const RegisterConsultaForm = () => {
                                 {...register("anexos")}
                             />
                             <FormErrorMessage>{errors.anexos?.message}</FormErrorMessage>
+                            <FormHelperText>Solo PDF, 2MB Max...</FormHelperText>
                         </FormControl>
 
                         <FormControl id="tipo_consulta" isRequired isInvalid={errors.tipo_consulta}>
@@ -835,7 +1084,7 @@ export const RegisterConsultaForm = () => {
 
             {/* Renderizamos el PDFDownloadLink condicionalmente */}
             {showDownloadLink && (
-                <BlobProvider document={<RegisterConsultaFormPDF formData={formData} />}>
+                <BlobProvider document={<RegisterConsultaFormPDF formData={bodyForm} />}>
                     {({ blob, url, loading, error }) => {
                         if (loading) {
                             return (
@@ -848,7 +1097,7 @@ export const RegisterConsultaForm = () => {
                         const handleDownload = () => {
                             const link = document.createElement('a');
                             link.href = url;
-                            link.download = 'consulta.pdf';
+                            link.download = 'soporte_consulta.pdf';
                             document.body.appendChild(link);
                             link.click();
                             document.body.removeChild(link);
@@ -864,6 +1113,15 @@ export const RegisterConsultaForm = () => {
                         );
                     }}
                 </BlobProvider>
+            )}
+
+            {/* Botón para reintentar la subida de archivos */}
+            {showRetryButton && (
+                <Stack justify="center" direction={{ base: 'column', sm: 'row' }} spacing={4} mt={6}>
+                <Button colorScheme="red" onClick={handleRetryUpload}>
+                    Reintentar subir archivos
+                </Button>
+                </Stack>
             )}
 
         </Flex>

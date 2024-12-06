@@ -4,8 +4,6 @@ import LogoUFPS2 from "../../assets/logo-ufps-2.png"
 
 export const RegisterConsultaFormPDF = ({ formData }) => {
 
-    console.log(formData);
-
     // Definimos los estilos
     const styles = StyleSheet.create({
         body: {
@@ -189,15 +187,24 @@ export const RegisterConsultaFormPDF = ({ formData }) => {
                             <Text style={styles.fieldValue}>{formData.lugar_nacimiento}</Text>
                         </View>
                         <View style={styles.fieldContainer}>
-                            <Text style={styles.fieldLabel}>Ciudad:</Text>
-                            <Text style={styles.fieldValue}>{formData.ciudad}</Text>
+                            <Text style={styles.fieldLabel}>Tipo de solicitante:</Text>
+                            <Text style={styles.fieldValue}>{formData.tipo_solicitante}</Text>
                         </View>
                     </View>
 
                     <View style={styles.row}>
                         <View style={styles.fieldContainer}>
+                            <Text style={styles.fieldLabel}>Ciudad:</Text>
+                            <Text style={styles.fieldValue}>{formData.ciudad}</Text>
+                        </View>
+
+                        <View style={styles.fieldContainer}>
                             <Text style={styles.fieldLabel}>Dirección actual:</Text>
                             <Text style={styles.fieldValue}>{formData.direccion_actual}</Text>
+                        </View>
+
+                        {/* Elemento vacio para rellenar el espacio */}
+                        <View style={styles.fieldContainer}>
                         </View>
                     </View>
                 </View>
@@ -284,7 +291,7 @@ export const RegisterConsultaFormPDF = ({ formData }) => {
                 {/* Datos de la consulta */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Datos de la Consulta</Text>
-                    {[{ label: "Hechos Relevantes", value: formData.hechosRelevantes },
+                    {[{ label: "Hechos Relevantes", value: formData.hechos },
                     { label: "Pretensiones", value: formData.pretensiones },
                     { label: "Observaciones", value: formData.observaciones }].map((item, index) => (
                         <Text style={styles.text} key={index}>
@@ -359,9 +366,6 @@ export const RegisterConsultaFormPDF = ({ formData }) => {
                     <Text style={styles.signature}>Firma del Estudiante</Text>
                     <Text style={styles.signature}>Firma del Usuario</Text>
                 </View>
-                <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vitae qui nobis perspiciatis! Quis quae voluptates iste numquam. Neque, harum tenetur. Officiis libero mollitia aliquid quae, commodi similique animi quibusdam eos omnis laborum maiores recusandae corporis obcaecati saepe natus fugit, suscipit dolorem. Laudantium reprehenderit voluptatem, ipsa quidem quisquam, eaque perspiciatis iusto accusantium facere distinctio enim minus incidunt? Impedit, totam. Aliquam, veniam, animi earum sint corporis distinctio magnam sunt necessitatibus nostrum ab enim pariatur repudiandae nisi quia libero at quis ipsa ut harum. Vero minima amet quaerat ratione tenetur, ut eius aspernatur provident at nihil molestias dolorum eligendi nisi dolor porro recusandae.
-                    
-                </div>
 
             </Page>
 

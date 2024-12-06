@@ -23,7 +23,7 @@ export const ResetPasswordForm = () => {
     const { register, 
         handleSubmit, 
         formState: { errors } 
-    } = useForm({ resolver: yupResolver(resetPasswordSchema) });
+    } = useForm({ resolver: yupResolver(resetPasswordSchema), mode: "onChange" });
 
     const { id, token } = useParams();
     const navigate = useNavigate();
