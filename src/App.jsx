@@ -11,7 +11,7 @@ function App() {
       <SessionExpiredProvider>
         <Toaster
           toastOptions={
-            { duration: 3500 }
+            { duration: 5000 }
           }
         />
         <AppRouter></AppRouter>
