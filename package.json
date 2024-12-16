@@ -19,8 +19,6 @@
     "chart.js": "^4.4.4",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.8.0",
-    "html2canvas": "^1.4.1",
-    "jspdf": "^2.5.2",
     "juridicol-front": "file:",
     "jwt-decode": "^4.0.0",
     "react": "^18.3.1",

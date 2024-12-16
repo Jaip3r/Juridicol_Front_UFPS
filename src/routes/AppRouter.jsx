@@ -43,7 +43,7 @@ export const AppRouter = () => {
 
                     {/* Rutas de estudiante */}
                     <Route element={<RequireAuth allowedRoles={["estudiante"]} />}>
-                        <Route path="student-home" element={<Home />} />
+                        <Route path="/student-home" element={<Home />} />
                         <Route path="/student-profile" element={<Perfil />} />
                     </Route>
 
@@ -61,11 +61,15 @@ export const AppRouter = () => {
                         <Route path="/solicitantes/edit/:id" element={<UpdateSolicitante />} />
                         <Route path="/solicitantes/consultas/:id" element={<ConsultasSolicitantes />} />
 
-                        <Route path="/recepcion-consulta" element={<RecepcionConsulta />} />
                         <Route path="/procesos/:tipo/:limite/:estado" element={<Consultas />} />
                         <Route path="/procesos/info/:id" element={<InfoConsultas />} />
 
                         <Route path="/archivos/consulta/:id" element={<Archivo />} />
+                    </Route>
+
+                    {/* Rutas compartidas */} 
+                    <Route element={<RequireAuth allowedRoles={["estudiante", "administrador"]} />}> 
+                        <Route path="/recepcion-consulta" element={<RecepcionConsulta />} /> 
                     </Route>
 
                     {/* Ruta para manejar 404 (página no encontrada) y acceso no autorizado */}

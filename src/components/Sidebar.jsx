@@ -1,5 +1,5 @@
 import { Box, VStack, Text, Link as ChakraLink, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Image, List, ListItem, ListIcon } from '@chakra-ui/react';
-import { FiGitPullRequest, FiHome, FiInbox, FiUsers } from 'react-icons/fi';
+import { FiFileText, FiGitPullRequest, FiHome, FiInbox, FiUsers } from 'react-icons/fi';
 import LogoJuridicol from '../assets/logo-juridicol.png';
 import { MdArrowForwardIos } from 'react-icons/md';
 import { FaRegFileAlt } from 'react-icons/fa';
@@ -211,14 +211,16 @@ export const Sidebar = () => {
                         </AccordionItem>
                     )}
 
-                    {/* Recepción de consultas para estudiante */}
+                    {/* Navegación para estudiantes */}
+
+                    {/* Home para estudiantes */}
                     {rol === 'estudiante' && (
-                        <AccordionItem borderTopWidth="1px" borderBottomWidth="1px" borderColor="gray.200">
+                        <AccordionItem borderTopColor="red" borderTopWidth="3px" borderBottomWidth="1px" borderBottomColor="gray.200">
                             <h2>
                                 <AccordionButton _hover={{ bg: "gray.100" }} py={3}>
                                     <Box flex="1" textAlign="left" fontSize="lg" display="flex" alignItems="center">
-                                        <FiInbox style={{ marginRight: "8px" }} />
-                                        <Text>Recepción de Consultas</Text>
+                                        <FiHome style={{ marginRight: "8px" }} />
+                                        <Text>Panel principal</Text>
                                     </Box>
                                     <AccordionIcon />
                                 </AccordionButton>
@@ -227,7 +229,94 @@ export const Sidebar = () => {
                                 <List spacing={2}>
                                     <ListItem>
                                         <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
-                                        <ChakraLink as={Link} to="/student-home">Recepción Consulta</ChakraLink>
+                                        <ChakraLink as={Link} to="/student-home">Home</ChakraLink>
+                                    </ListItem>
+                                </List>
+                            </AccordionPanel>
+                        </AccordionItem>
+                    )}
+
+                    {/* Gestión de Consultas */}
+                    {rol === 'estudiante' && (
+                        <AccordionItem borderTopWidth="1px" borderBottomWidth="1px" borderColor="gray.200">
+                            <h2>
+                                <AccordionButton _hover={{ bg: "gray.100" }} py={3}>
+                                    <Box flex="1" textAlign="left" fontSize="lg" display="flex" alignItems="center">
+                                        <FiInbox style={{ marginRight: "8px" }} />
+                                        <Text>Gestión de Consultas</Text>
+                                    </Box>
+                                    <AccordionIcon />
+                                </AccordionButton>
+                            </h2>
+                            <AccordionPanel pb={4}>
+                                <List spacing={2}>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <ChakraLink as={Link} to="/recepcion-consulta">Recepción Consulta</ChakraLink>
+                                    </ListItem>
+                                </List>
+                                <List spacing={2}>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <ChakraLink as={Link} to="#">Casos Asignados</ChakraLink>
+                                    </ListItem>
+                                </List>
+                                <List spacing={2}>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <ChakraLink as={Link} to="#">Casos Finalizados</ChakraLink>
+                                    </ListItem>
+                                </List>
+                            </AccordionPanel>
+                        </AccordionItem>
+                    )}
+
+                    {/* Desarrollo de Consultas */}
+                    {rol === 'estudiante' && (
+                        <AccordionItem borderTopWidth="1px" borderBottomWidth="1px" borderColor="gray.200">
+                            <h2>
+                                <AccordionButton _hover={{ bg: "gray.100" }} py={3}>
+                                    <Box flex="1" textAlign="left" fontSize="lg" display="flex" alignItems="center">
+                                        <FiFileText style={{ marginRight: "8px" }} />
+                                        <Text>Desarrollo de Consultas</Text>
+                                    </Box>
+                                    <AccordionIcon />
+                                </AccordionButton>
+                            </h2>
+                            <AccordionPanel pb={4}>
+                                <List spacing={2}>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <ChakraLink as={Link} to="#">Adición de Evidencias</ChakraLink>
+                                    </ListItem>
+                                </List>
+                            </AccordionPanel>
+                        </AccordionItem>
+                    )}
+
+                    {/* Solicitudes */}
+                    {rol === 'estudiante' && (
+                        <AccordionItem borderTopWidth="1px" borderBottomWidth="1px" borderColor="gray.200">
+                            <h2>
+                                <AccordionButton _hover={{ bg: "gray.100" }} py={3}>
+                                    <Box flex="1" textAlign="left" fontSize="lg" display="flex" alignItems="center">
+                                        <FiGitPullRequest style={{ marginRight: "8px" }} />
+                                        <Text>Solicitudes</Text>
+                                    </Box>
+                                    <AccordionIcon />
+                                </AccordionButton>
+                            </h2>
+                            <AccordionPanel pb={4}>
+                                <List spacing={2}>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <ChakraLink as={Link} to="#">Crear Solicitud</ChakraLink>
+                                    </ListItem>
+                                </List>
+                                <List spacing={2}>
+                                    <ListItem>
+                                        <ListIcon as={MdArrowForwardIos} color='black.500' width="10px" />
+                                        <ChakraLink as={Link} to="#">Estado Solicitudes</ChakraLink>
                                     </ListItem>
                                 </List>
                             </AccordionPanel>

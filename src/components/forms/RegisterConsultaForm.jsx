@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { FiCopy } from "react-icons/fi";
+import { useAuth } from "../../hooks/useAuth";
 
 
 // Esquema de validación
@@ -156,6 +157,10 @@ const registerConsultaSchema = yup.object().shape({
 
 export const RegisterConsultaForm = () => {
 
+    // Obtenemos el rol del usuario por medio del hook de autenticación
+    const { auth } = useAuth();
+    const { rol } = auth;
+
     // Estados para el manejo de la lógica de reintento
     const [consultaId, setConsultaId] = useState(null);
     const [anexos, setAnexos] = useState([]);
@@ -278,8 +283,9 @@ export const RegisterConsultaForm = () => {
              
             reset();
 
-            if (response?.status === 201) {
-                navigate("/procesos/consulta/diaria/pendiente");
+            // Si el usuario es administrador, redirigimos
+            if (response?.status === 201 && rol === 'administrador') {
+                navigate('/procesos/consulta/diaria/pendiente');
             }
 
         } catch (error) {
@@ -346,10 +352,17 @@ export const RegisterConsultaForm = () => {
 
             // Limpiamos los estados relacionados y navegamos a la página correspondiente
             if (response?.status === 200) {
+
                 setConsultaId(null);
                 setAnexos([]);
                 setShowRetryButton(false);
-                navigate('/procesos/consulta/diaria/pendiente');
+
+                if (rol === 'administrador') {
+                    navigate('/procesos/consulta/diaria/pendiente');
+                } else {
+                    reset();
+                }
+                
             }
             
         } catch (error) {
