@@ -19,6 +19,7 @@ function App() {
           closeOnClick={false}
           transition={Zoom}
           limit={8}
+          pauseOnFocusLoss={false}
         />
         <Toaster
           toastOptions={
