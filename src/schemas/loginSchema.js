@@ -6,4 +6,4 @@ export const loginSchema = yup.object().shape({
         .email("Usuario no válido"),
     password: yup.string()
         .required("La contraseña es requerida")
-})
+});

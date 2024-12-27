@@ -2,22 +2,14 @@ import { Button, FormControl, FormErrorMessage, FormLabel, Input } from '@chakra
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router-dom';
-import * as yup from 'yup';
-import axios from '../../services/axios';
-import toast from 'react-hot-toast';
-
+import { toast } from 'react-toastify';
+import { resetPasswordSchema } from '../../schemas/resetPasswordSchema';
+import { useMutation } from '@tanstack/react-query';
+import { resetPassword } from '../../services/passwordService';
+import { useRef } from 'react';
 
 export const ResetPasswordForm = () => {
-
-    // Esquema de validación
-    const resetPasswordSchema = yup.object().shape({
-        newPassword: yup.string()
-            .required("La nueva contraseña es requerida")
-            .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "La nueva contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial"),
-        confirmarPassword: yup.string()
-            .required("El campo de confirmación de contraseña es requerido")
-            .oneOf([yup.ref("newPassword")], "Las contraseñas no coinciden")
-    })
+    const toastRef = useRef(null);
 
     // Configuración de hook-form
     const { register, 
@@ -25,11 +17,54 @@ export const ResetPasswordForm = () => {
         formState: { errors } 
     } = useForm({ resolver: yupResolver(resetPasswordSchema), mode: "onChange" });
 
+    // Obtenemos el id y token de los parametros de ruta
     const { id, token } = useParams();
+
+    // Hook para navegación programática
     const navigate = useNavigate();
+
+    // Mutación para restablecer contraseña
+    const resetPasswordMutation = useMutation({
+        mutationFn: resetPassword,
+        onMutate: async () => {
+            toastRef.current = toast.loading("Verificando información...");
+        },
+        onSuccess: () => {
+            toast.update(toastRef.current, {
+                render: "Contraseña restablecida con éxito",
+                type: "success",
+                isLoading: false,
+                autoClose: 5000,
+                closeButton: true,
+                pauseOnFocusLoss: false
+            });  
+            navigate("/");  
+        },
+        onError: (error) => {
+            let message = "Error al restablecer contraseña";
+
+            if (!error?.response) {
+                message = "Sin respuesta del servidor";
+            } else if (error?.response?.data?.message) {
+                message = error.response.data.message;
+            }
+
+            toast.update(toastRef.current, {
+                render: message,
+                type: "error",
+                isLoading: false,
+                autoClose: 5000,
+                closeButton: true,
+                pauseOnFocusLoss: false
+            });
+
+            navigate("/");
+        }
+    })
 
     const onSubmit = handleSubmit(async (data) => {
 
+        // Cuerpo de la solicitud
         const body = {
 
             resetToken: token,
@@ -38,27 +73,8 @@ export const ResetPasswordForm = () => {
 
         }
 
-        await toast.promise(
-
-            axios.put('/auth/reset-password', body, {
-                headers:{
-                    "Content-Type": "application/json"
-                }
-            }),
-            {
-                loading: 'Verificando información...',
-                success: 'Contraseña restablecida con éxito',
-                error: (error) => {
-                    if (!error?.response) toast.error("Sin respuesta del servidor");
-                    else {
-                        return error?.response?.data?.message || 'Error al restablecer contraseña';
-                    }
-                }
-            }
-
-        );
-
-        navigate("/");
+        // Disparamos la mutación
+        resetPasswordMutation.mutate(body);
 
     });
 
@@ -87,6 +103,8 @@ export const ResetPasswordForm = () => {
                 width="100%"
                 borderRadius="full"
                 mt={6}
+                isLoading={resetPasswordMutation.isPending}
+                loadingText="Restableciendo..."
             >
                 Restablecer
             </Button>

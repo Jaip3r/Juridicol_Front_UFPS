@@ -5,5 +5,13 @@ export async function findAccount(account) {
         headers:{
             "Content-Type": "application/json"
         }
-    })
+    });
+}
+
+export async function resetPassword(body) {
+    return await axios.put('/auth/reset-password', body, {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
 }
