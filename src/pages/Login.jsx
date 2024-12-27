@@ -1,21 +1,35 @@
-import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormLabel, Image, Input, Stack, useBreakpointValue } from "@chakra-ui/react";
+import { 
+    Box, 
+    Button, 
+    Checkbox, 
+    FormControl, 
+    FormErrorMessage, 
+    FormLabel, 
+    Image, 
+    Input, 
+    InputGroup, 
+    InputRightElement, 
+    Stack, 
+    useBreakpointValue 
+} from "@chakra-ui/react";
 import LogoConsultorio from "../assets/LogoConsultorio.jpeg";
 import LogoUFPS from "../assets/logo-ufps.jpg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { loginSchema } from "./schemas/loginSchema";
+import { loginSchema } from "../schemas/loginSchema";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Background } from "../components/container/Background";
 import { CardWrapper } from "../components/utils/CardWrapper";
-import axios from "../services/axios";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify"; 
 import { useAuth } from "../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
-import { useEffect } from "react";
-
+import { usePersist } from "../hooks/usePersist";
+import { REDIRECT_LOGIN_PATH } from "../utils/constants";
+import { loginUser } from "../services/loginService";
+import { useShowPasswordForm } from "../hooks/useShowPasswordForm";
+import { useMutation } from "@tanstack/react-query";
 
 export const Login = () => {
-
     // Use `useBreakpointValue` para ajustar el tamaño de la imagen de forma responsiva
     const imageBoxSize = useBreakpointValue({ base: "200px", md: "300px", lg: "90%" });
     const formImageSize = useBreakpointValue({ base: "100px", md: "150px", lg: "200px" });
@@ -23,75 +37,61 @@ export const Login = () => {
     // Use `useBreakpointValue` para cambiar el orden en pantallas más pequeñas
     const stackDirection = useBreakpointValue({ base: "column-reverse", md: "row" });
 
+    // Estado para manejar la muestra de la contraseña
+    const { show, handleClick } = useShowPasswordForm();
 
     // Contexto de autenticación 
-    const { setAuth, persist, setPersist  } = useAuth()
+    const { setAuth } = useAuth();
+    const { persist, togglePersist } = usePersist();
 
     // Configuración de react-hook-form
-    const { register, handleSubmit,
+    const { 
+        register, 
+        handleSubmit,
         formState: { errors },
         reset
     } = useForm({ resolver: yupResolver(loginSchema) });
-
 
     // Hook que permite la navegación programática
     const navigate = useNavigate(); 
     const location = useLocation(); // Hook que te da acceso a la ubicación actual.
 
-    // Manejo de envio de formulario
-    const onSubmit = handleSubmit(async (data) => {
-    
-        try {
+    // Mutación para login
+    const loginMutation = useMutation({
+        mutationFn: loginUser,
+        onSuccess: (response) => {
+            const token = response?.accessToken;
+            const decoded = jwtDecode(token);
 
-            // Petición al servidor
-            const response = await axios.post("/auth/login", 
-                JSON.stringify({ email: data.usuario, password: data.password }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                }
-            );
-
-            // Obtenemos los datos de autenticación y los guardamos en el contexto
-            const accessToken = response?.data?.data;
-            const decoded = jwtDecode(accessToken);
-            const user = decoded.username;
-            const rol = decoded.rol;
-            setAuth({ user, welcomeMessage: `Bienvenido ${user}`, accessToken, rol });
+            setAuth({
+                user: decoded.username,
+                welcomeMessage: `Bienvenido ${decoded.username}`,
+                token,
+                rol: decoded.rol,
+            });
 
             // Redirigimos al usuario a su página de inicio correspondiente según el rol
-            let baseURL = '';
+            const redirectURL = REDIRECT_LOGIN_PATH[decoded.rol] || "/";
 
-            if (rol === 'administrador') {
-                baseURL = '/admin-dashboard';
-            } else if (rol === 'estudiante') {
-                baseURL = '/student-home'; 
-            } else if (rol === 'profesor') {
-                baseURL = '/professor-dashboard'; 
-            } else {
-                baseURL = '/';
-            }
-
-            const from = location.state?.from?.pathname || baseURL;
+            const from = location.state?.from?.pathname || redirectURL;
             navigate(from, { replace: true }); // Redirige al usuario a la página desde donde intentaba acceder
 
             // Limpiamos los campos
             reset();
-
-        }catch (error) {
+        },
+        onError: (error) => {
             if (!error?.response) toast.error("Sin respuesta del servidor");
             else toast.error(error?.response?.data?.message);
         }
+    })
+
+    // Manejo de envio de formulario
+    const handleLoginSubmit = handleSubmit(async (data) => {
+    
+        // Iniciamos la mutación pasando las credenciales
+        loginMutation.mutate({ email: data.usuario, password: data.password });
 
     });
-
-    const togglePersist = () => {
-        setPersist(prev => !prev)
-    }
-
-    useEffect(() => {
-        localStorage.setItem("persist", persist);
-    }, [persist]);
 
     return (
         <Background>
@@ -130,7 +130,7 @@ export const Login = () => {
                             width="90%"
                             mb={6}
                         />
-                        <form onSubmit={onSubmit}>
+                        <form onSubmit={handleLoginSubmit}>
 
                             { /* Usuario */ }
                             <FormControl id="usuario" mb={4} isInvalid={errors.usuario}>
@@ -148,11 +148,18 @@ export const Login = () => {
 
                             <FormControl id="contraseña" mb={6} isInvalid={errors.password}>
                                 <FormLabel>Contraseña</FormLabel>
-                                <Input 
-                                    type="password" 
-                                    placeholder="Ingresa tu contraseña" 
-                                    {...register("password")}
-                                />
+                                <InputGroup>
+                                    <Input 
+                                        type={show ? 'text' : 'password'}
+                                        placeholder="Ingresa tu contraseña" 
+                                        {...register("password")}
+                                    />
+                                    <InputRightElement width='5.5rem'>
+                                        <Button h='1.75rem' size='sm' onClick={handleClick}>
+                                            {show ? 'Ocultar' : 'Mostrar'}
+                                        </Button>
+                                    </InputRightElement>
+                                </InputGroup>
                                 <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
                             </FormControl>
 
