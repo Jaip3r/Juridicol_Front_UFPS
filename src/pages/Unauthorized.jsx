@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 import { Background } from "../components/container/Background";
 import { CardWrapper } from "../components/utils/CardWrapper";
 import { Link } from "react-router-dom";
+import { REDIRECT_LOGIN_PATH } from "../utils/constants";
 
 
 export const Unauthorized = () => {
@@ -19,16 +20,8 @@ export const Unauthorized = () => {
 
         const rol = auth.rol;
 
-        if (rol === 'administrador') {
-            return '/admin-dashboard';
-        } else if (rol === 'estudiante') {
-            return '/student-home';
-        } else if (rol === 'profesor') {
-            return '/profesor';
-        }
-        else {
-            return '/';
-        }
+        // Redirigimos al usuario a su página de inicio correspondiente según el rol
+        return REDIRECT_LOGIN_PATH[rol] || "/";
 
     };
 

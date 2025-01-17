@@ -5,15 +5,10 @@ import { forgotPasswordSchema } from '../schemas/forgotPasswordSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Background } from '../components/container/Background';
 import { CardWrapper } from '../components/utils/CardWrapper';
-import { toast } from 'react-toastify';
-import { useMutation } from '@tanstack/react-query';
-import { findAccount } from '../services/passwordService';
-import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useFindAccount } from '../hooks/mutations/useFindAccount';
 
 export const RequestResetPasswordForm = () => {
-    const toastRef = useRef(null);
-
     // Configuración de react-hook-form
     const { 
         register, 
@@ -23,40 +18,7 @@ export const RequestResetPasswordForm = () => {
     } = useForm({ resolver: yupResolver(forgotPasswordSchema) });
 
     // Mutación para la solicitud de restablecimiento de contraseña
-    const forgotPasswordMutation = useMutation({
-        mutationFn: findAccount,
-        onMutate: async () => {
-            toastRef.current = toast.loading("Verificando información...");
-        },
-        onSuccess: () => {
-            toast.update(toastRef.current, {
-                render: "Si el usuario se encuentra registrado, recibirá un correo",
-                type: "success",
-                isLoading: false,
-                autoClose: 5000,
-                closeButton: true,
-                pauseOnFocusLoss: false
-            })
-            reset();
-        },
-        onError: (error) => {
-            let message = "Error al enviar correo de restablecimiento";
-            if (!error?.response) {
-                message = "Sin respuesta del servidor";
-            } else if (error?.response?.data?.message) {
-                message = error.response.data.message;
-            }
-
-            toast.update(toastRef.current, {
-                render: message,
-                type: "error",
-                isLoading: false,
-                autoClose: 5000,
-                closeButton: true,
-                pauseOnFocusLoss: false
-            });
-        }
-    });
+    const { mutate, isPending, isPaused } = useFindAccount(reset);
 
     const onSubmit = handleSubmit((data) => {
 
@@ -66,7 +28,7 @@ export const RequestResetPasswordForm = () => {
         }
         
         // Disparamos la mutación
-        forgotPasswordMutation.mutate(body);
+        mutate(body);
 
     });
 
@@ -98,8 +60,8 @@ export const RequestResetPasswordForm = () => {
                         width="100%"
                         borderRadius="full"
                         fontSize="lg"
-                        isLoading={forgotPasswordMutation.isPending}
-                        loadingText="Verificando..."
+                        isLoading={isPending || isPaused}
+                        loadingText={isPaused ? "Esperando conexión a internet..." : "Verificando información..."}
                     >
                         Buscar
                     </Button>

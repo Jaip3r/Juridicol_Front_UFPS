@@ -17,17 +17,12 @@ import LogoUFPS from "../assets/logo-ufps.jpg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../schemas/loginSchema";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Background } from "../components/container/Background";
-import { CardWrapper } from "../components/utils/CardWrapper";
-import { toast } from "react-toastify"; 
-import { useAuth } from "../hooks/useAuth";
-import { jwtDecode } from "jwt-decode";
+import { CardWrapper } from "../components/utils/CardWrapper"; 
 import { usePersist } from "../hooks/usePersist";
-import { REDIRECT_LOGIN_PATH } from "../utils/constants";
-import { loginUser } from "../services/loginService";
 import { useShowPasswordForm } from "../hooks/useShowPasswordForm";
-import { useMutation } from "@tanstack/react-query";
+import { useLoginMutation } from "../hooks/mutations/useLoginMutation";
 
 export const Login = () => {
     // Use `useBreakpointValue` para ajustar el tamaño de la imagen de forma responsiva
@@ -40,8 +35,7 @@ export const Login = () => {
     // Estado para manejar la muestra de la contraseña
     const { show, handleClick } = useShowPasswordForm();
 
-    // Contexto de autenticación 
-    const { setAuth } = useAuth();
+    // Persistencia de la sesión
     const { persist, togglePersist } = usePersist();
 
     // Configuración de react-hook-form
@@ -52,45 +46,13 @@ export const Login = () => {
         reset
     } = useForm({ resolver: yupResolver(loginSchema) });
 
-    // Hook que permite la navegación programática
-    const navigate = useNavigate(); 
-    const location = useLocation(); // Hook que te da acceso a la ubicación actual.
-
     // Mutación para login
-    const loginMutation = useMutation({
-        mutationFn: loginUser,
-        onSuccess: (response) => {
-            const token = response?.accessToken;
-            const decoded = jwtDecode(token);
-
-            setAuth({
-                user: decoded.username,
-                welcomeMessage: `Bienvenido ${decoded.username}`,
-                token,
-                rol: decoded.rol,
-            });
-
-            // Redirigimos al usuario a su página de inicio correspondiente según el rol
-            const redirectURL = REDIRECT_LOGIN_PATH[decoded.rol] || "/";
-
-            const from = location.state?.from?.pathname || redirectURL;
-            navigate(from, { replace: true }); // Redirige al usuario a la página desde donde intentaba acceder
-
-            // Limpiamos los campos
-            reset();
-        },
-        onError: (error) => {
-            if (!error?.response) toast.error("Sin respuesta del servidor");
-            else toast.error(error?.response?.data?.message);
-        }
-    })
+    const { mutate, isPending, isPaused } = useLoginMutation(reset);
 
     // Manejo de envio de formulario
     const handleLoginSubmit = handleSubmit(async (data) => {
-    
         // Iniciamos la mutación pasando las credenciales
-        loginMutation.mutate({ email: data.usuario, password: data.password });
-
+        mutate({ email: data.usuario, password: data.password });
     });
 
     return (
@@ -168,6 +130,8 @@ export const Login = () => {
                                 colorScheme="red"
                                 width="80%"
                                 borderRadius="full"
+                                isLoading={isPending || isPaused}
+                                loadingText={isPaused ? "Esperando conexión a internet..." : "Verificando información..."}
                             >
                                 Ingresar
                             </Button>

@@ -2,15 +2,10 @@ import { Button, FormControl, FormErrorMessage, FormLabel, Input } from '@chakra
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { resetPasswordSchema } from '../../schemas/resetPasswordSchema';
-import { useMutation } from '@tanstack/react-query';
-import { resetPassword } from '../../services/passwordService';
-import { useRef } from 'react';
+import { useResetPassword } from '../../hooks/mutations/useResetPassword';
 
 export const ResetPasswordForm = () => {
-    const toastRef = useRef(null);
-
     // Configuración de hook-form
     const { register, 
         handleSubmit, 
@@ -24,43 +19,7 @@ export const ResetPasswordForm = () => {
     const navigate = useNavigate();
 
     // Mutación para restablecer contraseña
-    const resetPasswordMutation = useMutation({
-        mutationFn: resetPassword,
-        onMutate: async () => {
-            toastRef.current = toast.loading("Verificando información...");
-        },
-        onSuccess: () => {
-            toast.update(toastRef.current, {
-                render: "Contraseña restablecida con éxito",
-                type: "success",
-                isLoading: false,
-                autoClose: 5000,
-                closeButton: true,
-                pauseOnFocusLoss: false
-            });  
-            navigate("/");  
-        },
-        onError: (error) => {
-            let message = "Error al restablecer contraseña";
-
-            if (!error?.response) {
-                message = "Sin respuesta del servidor";
-            } else if (error?.response?.data?.message) {
-                message = error.response.data.message;
-            }
-
-            toast.update(toastRef.current, {
-                render: message,
-                type: "error",
-                isLoading: false,
-                autoClose: 5000,
-                closeButton: true,
-                pauseOnFocusLoss: false
-            });
-
-            navigate("/");
-        }
-    })
+    const { mutate, isPending, isPaused } = useResetPassword();
 
     const onSubmit = handleSubmit(async (data) => {
 
@@ -74,7 +33,7 @@ export const ResetPasswordForm = () => {
         }
 
         // Disparamos la mutación
-        resetPasswordMutation.mutate(body);
+        mutate(body, { onSettled: () => navigate("/") });
 
     });
 
@@ -103,8 +62,8 @@ export const ResetPasswordForm = () => {
                 width="100%"
                 borderRadius="full"
                 mt={6}
-                isLoading={resetPasswordMutation.isPending}
-                loadingText="Restableciendo..."
+                isLoading={isPending || isPaused}
+                loadingText={isPaused ? "Esperando conexión a internet..." : "Restableciendo contraseña..."}
             >
                 Restablecer
             </Button>
